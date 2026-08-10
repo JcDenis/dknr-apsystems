@@ -1060,8 +1060,8 @@
                 "solarEvents": "sunrise,sunset"
             }
         ],
-        "x": 170,
-        "y": 360,
+        "x": 350,
+        "y": 300,
         "wires": [
             [
                 "3538a60e6e05ade1"
@@ -1090,7 +1090,7 @@
         "type": "function",
         "z": "4bc72a1112cb448c",
         "name": "parse buffer",
-        "func": "function apsError(start) {\n    throw new Error(`Données insuffisantes à la position ${start}`);\n}\n\nfunction apsStr(buffer, start, amount) {\n    if ((start + amount) > buffer.length) apsError(start);\n\n    return buffer\n        .subarray(start, start + amount)\n        .toString(\"ascii\");\n}\n\nfunction apsUid(buffer, start) {\n    if ((start + 12) > buffer.length) apsError(start);\n\n    return buffer\n        .subarray(start, start + 12)\n        .toString(\"ascii\");\n}\n\nfunction apsInt(buffer, start) {\n    if ((start + 2) > buffer.length) apsError(start);\n\n    return buffer.readUInt16BE(start);\n}\n\nfunction apsDouble(buffer, start) {\n    if ((start + 4) > buffer.length) apsError(start);\n\n    return buffer.readUInt32BE(start);\n}\n\nfunction apsShort(buffer, start) {\n    try {\n        return parseInt(buffer.subarray(start, start + 1).toString('hex'), 8);\n    } catch (err) {\n        apsError(start);\n    }\n}\n\nif (typeof msg.data !== 'object') {\n    // Grab known ECU IP\n    let units = global.get('units', 'default');\n    if (typeof units === 'object') {\n        for (const name in units) {\n            node.send([{\n                'topic': name,\n                'host': units[name]['ip'],\n                'port': '8899',\n                'payload': \"APS1100160001\" + \"END\\n\",\n                'data': {}\n            }, null]);\n        }\n    }\n\n    return;\n}\n\nif (typeof msg.data.ecu !== 'object') {\n\n    // Parse ECU data\n    let buf = Buffer.from(msg.payload);\n    msg.data = {\n        'ecu': {\n            'id': '',\n            'type': 0,\n            'energy_total': 0,\n            'energy_today': 0,\n            'power_instant': 0,\n            'inverters_number': 0,\n            'inverters_online': 0\n        }\n    }\n\n    if (apsStr(buf, 9, 4) === \"0001\") {\n        msg.data.ecu.id = apsStr(buf, 13, 12);\n        msg.data.ecu.type = Number(apsStr(buf, 25, 2)); // 1 or 2\n        msg.data.ecu.energy_total = apsDouble(buf, 27) / 10;\n        msg.data.ecu.power_instant = apsDouble(buf, 31)\n        msg.data.ecu.energy_today = apsDouble(buf, 35) / 100;\n\n        if (msg.data.ecu.type === 1) {\n            msg.data.ecu.inverters_number = apsInt(buf, 46);\n            msg.data.ecu.inverters_online = apsInt(buf, 48);\n        }\n        else if (msg.data.ecu.type === 2) {\n            msg.data.ecu.inverters_number = apsInt(buf, 39);\n            msg.data.ecu.inverters_online = apsInt(buf, 41);\n        }\n\n        // prepare Inverter query\n        if (msg.data.ecu.inverters_number > 0) {\n            msg.payload = \"APS1100280002\" + msg.data.ecu.id + \"END\\n\";\n        \n            node.send([msg, null]);\n        } else {\n            node.send([null, msg]);\n        }\n    }\n\n    return\n}\nelse {\n\n    // Parse Inverter data\n    let buf = Buffer.from(msg.payload);\n    msg.data.inverters = {}\n\n    if (apsStr(buf, 9, 4) === \"0002\") {\n        let offset1 = 0;\n        let offset2 = 26;\n\n        if (apsStr(buf, 14, 2) == \"00\") {\n            while (offset1 < apsInt(buf, 17)) {\n                if (apsStr(buf, 15, 2) == \"01\") {\n                    msg.data.inverters[offset1] = {\n                        'id': apsUid(buf, offset2),\n                        'type': Number(apsStr(buf, offset2 + 7, 2)),\n                        'online': apsShort(buf, offset2 + 6),\n                        'temperature': 0\n                    };\n\n                    // common\n                    if (msg.data.inverters[offset1]['type'] in [1, 2, 3, 4, 5]) {\n                        msg.data.inverters[offset1]['frequency'] = apsInt(buf, offset2 + 9) / 10;\n\n                        if (msg.data.inverters[offset1]['online'] === 1) {\n                            msg.data.inverters[offset1]['temperature'] = apsInt(buf, offset2 + 11) - 100;\n                        }\n                    }\n\n                    if (msg.data.inverters[offset1]['type'] in [1, 4, 5]) {\n\n                        offset2 = offset2 + 21;\n                    }\n                    else if (msg.data.inverters[offset1]['type'] === 2) {\n\n                        offset2 = offset2 + 27;\n                    }\n                    else if (msg.data.inverters[offset1]['type'] === 3) {\n\n                        offset2 = offset2 + 23;\n                    }\n                    else {\n                        offset2 = offset2 + 9;\n                    }\n                }\n\n                offset1++;\n            }\n        }\n    }\n    node.send([null, msg]);\n\n    return;\n}\n",
+        "func": "function apsError(start) {\n    node.status('Error start at: ' + start);\n    throw new Error(`Données insuffisantes à la position ${start}`);\n}\n\nfunction apsStr(buffer, start, amount) {\n    if ((start + amount) > buffer.length) apsError(start);\n\n    return buffer.subarray(start, start + amount).toString('utf8');\n}\n\nfunction apsUid(buffer, start) {\n    if ((start + 12) > buffer.length) apsError(start);\n\n    return buffer.subarray(start, start + 12).toString('hex').slice(0, 12);\n}\n\nfunction apsInt(buffer, start) {\n    if ((start + 2) > buffer.length) apsError(start);\n\n    return buffer.readUInt16BE(start);\n}\n\nfunction apsDouble(buffer, start) {\n    if ((start + 4) > buffer.length) apsError(start);\n\n    return buffer.readUInt32BE(start);\n}\n\nfunction apsShort(buffer, start) {\n    try {\n        return parseInt(buffer.subarray(start, start + 1).toString('hex'), 8);\n    } catch (err) {\n        apsError(start);\n    }\n}\n\nif (typeof msg.data !== 'object') {\n    // Grab known ECU IP\n    let units = global.get('units', 'default');\n    if (typeof units === 'object') {\n        for (const name in units) {\n            node.send([{\n                'topic': name,\n                'host': units[name]['ip'],\n                'port': '8899',\n                'payload': \"APS1100160001\" + \"END\\n\",\n                'data': {}\n            }, null]);\n        }\n    }\n\n    return;\n}\n\nif (typeof msg.data.ecu !== 'object') {\n\n    // Parse ECU data\n    let buf = Buffer.from(msg.payload);\n    node.status({ text: 'buffer length: ' + buf.length});\n    msg.data = {\n        'ecu': {\n            'id': '',\n            'type': 0,\n            'energy_total': 0,\n            'energy_today': 0,\n            'power_instant': 0,\n            'inverters_number': 0,\n            'inverters_online': 0\n        }\n    }\n\n    if (apsStr(buf, 9, 4) === \"0001\") {\n        msg.data.ecu.id = apsStr(buf, 13, 12);\n        msg.data.ecu.type = parseInt(apsStr(buf, 25, 2), 10); // 1 or 2\n        msg.data.ecu.energy_total = apsDouble(buf, 27) / 10;\n        msg.data.ecu.power_instant = apsDouble(buf, 31)\n        msg.data.ecu.energy_today = apsDouble(buf, 35) / 100;\n\n        if (msg.data.ecu.type === 1) {\n            msg.data.ecu.inverters_number = apsInt(buf, 46);\n            msg.data.ecu.inverters_online = apsInt(buf, 48);\n\n            let offset_f = parseInt(apsStr(buf, 52, 3), 10);\n            msg.data.ecu.firmware = apsStr(buf, 55, offset_f);\n            let offset_t = parseInt(apsStr(buf, 55 + offset_f, 3), 10);\n            msg.data.ecu.timezone = apsStr(buf, 58 + offset_f, offset_t);\n\n        }\n        else if (msg.data.ecu.type === 2) {\n            msg.data.ecu.inverters_number = apsInt(buf, 39);\n            msg.data.ecu.inverters_online = apsInt(buf, 41);\n\n            let offset_f = parseInt(apsStr(buf, 49, 3), 10);\n            msg.data.ecu.firmware = apsStr(buf, 52, offset_f);\n        }\n\n        // prepare Inverter query\n        if (msg.data.ecu.inverters_number > 0) {\n            msg.payload = \"APS1100280002\" + msg.data.ecu.id + \"END\\n\";\n        \n            node.send([msg, null]);\n        } else {\n            node.send([null, msg]);\n        }\n    }\n\n    return\n}\nelse {\n\n    // Parse Inverter data\n    let buf = Buffer.from(msg.payload);\n    msg.data.inverters = {}\n\n    if (apsStr(buf, 9, 4) === \"0002\") {\n        let offset1 = 0;\n        let offset2 = 26;\n\n        if (apsStr(buf, 14, 2) == \"00\") {\n            while (offset1 < apsInt(buf, 17)) {\n                if (apsStr(buf, 15, 2) == \"01\") {\n                    msg.data.inverters[offset1] = {\n                        'id': apsUid(buf, offset2),\n                        'type': Number(apsStr(buf, offset2 + 7, 2)),\n                        'online': apsShort(buf, offset2 + 6),\n                        'temperature': 0\n                    };\n\n                    // common\n                    if (msg.data.inverters[offset1]['type'] in [1, 2, 3, 4, 5]) {\n                        msg.data.inverters[offset1]['frequency'] = apsInt(buf, offset2 + 9) / 10;\n\n                        if (msg.data.inverters[offset1]['online'] === 1) {\n                            msg.data.inverters[offset1]['temperature'] = apsInt(buf, offset2 + 11) - 100;\n                        }\n                    }\n\n                    if (msg.data.inverters[offset1]['type'] in [1, 4, 5]) {\n\n                        offset2 = offset2 + 21;\n                    }\n                    else if (msg.data.inverters[offset1]['type'] === 2) {\n\n                        offset2 = offset2 + 27;\n                    }\n                    else if (msg.data.inverters[offset1]['type'] === 3) {\n\n                        offset2 = offset2 + 23;\n                    }\n                    else {\n                        offset2 = offset2 + 9;\n                    }\n                }\n\n                offset1++;\n            }\n        }\n    }\n    node.send([null, msg]);\n\n    return;\n}\n",
         "outputs": 2,
         "timeout": 0,
         "noerr": 0,
@@ -1115,18 +1115,46 @@
         "name": "ECU Queries",
         "server": "",
         "port": "",
-        "out": "char",
+        "out": "time",
         "ret": "buffer",
-        "splitc": "END\\n",
+        "splitc": "2000",
         "newline": "",
         "trim": false,
         "tls": "",
         "x": 370,
-        "y": 300,
+        "y": 420,
         "wires": [
             [
-                "3538a60e6e05ade1"
+                "3538a60e6e05ade1",
+                "699796f0f73f6054"
             ]
         ]
+    },
+    {
+        "id": "045ef84fbc38fcac",
+        "type": "comment",
+        "z": "4bc72a1112cb448c",
+        "name": "Source",
+        "info": "https://github.com/fligneul/aps2mqtt/blob/main/src/aps2mqtt/apsystems/APSystemsSocket.py#L153\n",
+        "x": 830,
+        "y": 340,
+        "wires": []
+    },
+    {
+        "id": "699796f0f73f6054",
+        "type": "debug",
+        "z": "4bc72a1112cb448c",
+        "name": "debug 1",
+        "active": true,
+        "tosidebar": true,
+        "console": false,
+        "tostatus": false,
+        "complete": "true",
+        "targetType": "full",
+        "statusVal": "",
+        "statusType": "auto",
+        "x": 560,
+        "y": 420,
+        "wires": []
     }
 ]
