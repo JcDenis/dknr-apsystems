@@ -132,6 +132,30 @@
         "h": 142
     },
     {
+        "id": "80eb56db05239272",
+        "type": "group",
+        "z": "4bc72a1112cb448c",
+        "name": "ui - add",
+        "style": {
+            "fill": "#6f2fa0",
+            "fill-opacity": "0.05",
+            "label": true
+        },
+        "nodes": [
+            "b9e756ce9dd6756f",
+            "bf39d2a0b6757d31",
+            "78b806cb99572299",
+            "bb5f28c2a7a9d3ad",
+            "366a2ba9f4f929ce",
+            "8e74082b23e26d09",
+            "f9e9e9dd56fec255"
+        ],
+        "x": 84,
+        "y": 1179,
+        "w": 1092,
+        "h": 82
+    },
+    {
         "id": "df7710b4b2c4e55b",
         "type": "ui-base",
         "name": "Tableau de bord",
@@ -173,7 +197,7 @@
     {
         "id": "f89655b525aee8cd",
         "type": "ui-page",
-        "name": "Teleinfo",
+        "name": "Solaire",
         "ui": "df7710b4b2c4e55b",
         "path": "/",
         "icon": "home",
@@ -213,7 +237,7 @@
         "page": "f89655b525aee8cd",
         "width": "3",
         "height": 1,
-        "order": 2,
+        "order": 3,
         "showTitle": false,
         "className": "",
         "visible": "true",
@@ -271,10 +295,24 @@
         "group": "8d032322dc675ac9",
         "name": "spacer",
         "tooltip": "",
-        "order": 3,
+        "order": 1,
         "width": "6",
         "height": 1,
         "className": ""
+    },
+    {
+        "id": "c8d7c7ef32d2e43c",
+        "type": "ui-group",
+        "name": "Ajouter",
+        "page": "f89655b525aee8cd",
+        "width": "3",
+        "height": 1,
+        "order": 2,
+        "showTitle": false,
+        "className": "",
+        "visible": "true",
+        "disabled": "false",
+        "groupType": "default"
     },
     {
         "id": "025edbd02daf82d0",
@@ -334,10 +372,7 @@
         "z": "4bc72a1112cb448c",
         "g": "9e3dbf7ae870765f",
         "name": "kernel - mqtt send",
-        "links": [
-            "11a311cff80fcfb0",
-            "f4b715c1321c6848"
-        ],
+        "links": [],
         "x": 125,
         "y": 680,
         "wires": [
@@ -353,8 +388,7 @@
         "g": "671369a42a9b2d5c",
         "name": "ui - display error",
         "links": [
-            "92c098c716e46e3b",
-            "f4b715c1321c6848"
+            "92c098c716e46e3b"
         ],
         "x": 125,
         "y": 1100,
@@ -403,9 +437,9 @@
         "mode": "link",
         "links": [
             "3fa36de74a10eac1",
-            "a76f1ec815999855",
             "df19be1275e79b1c",
-            "f4a2353e5f92576c"
+            "f4a2353e5f92576c",
+            "b9e756ce9dd6756f"
         ],
         "x": 315,
         "y": 140,
@@ -720,7 +754,8 @@
         "name": "ui - control",
         "mode": "link",
         "links": [
-            "df19be1275e79b1c"
+            "df19be1275e79b1c",
+            "b9e756ce9dd6756f"
         ],
         "x": 395,
         "y": 860,
@@ -787,6 +822,310 @@
         "wires": [
             [
                 "fecaee88b8c296ed"
+            ]
+        ]
+    },
+    {
+        "id": "b9e756ce9dd6756f",
+        "type": "link in",
+        "z": "4bc72a1112cb448c",
+        "g": "80eb56db05239272",
+        "name": "ui - add",
+        "links": [
+            "911bbe32f79bec46",
+            "92c098c716e46e3b",
+            "8e74082b23e26d09"
+        ],
+        "x": 125,
+        "y": 1220,
+        "wires": [
+            [
+                "78b806cb99572299"
+            ]
+        ]
+    },
+    {
+        "id": "bf39d2a0b6757d31",
+        "type": "ui-form",
+        "z": "4bc72a1112cb448c",
+        "g": "80eb56db05239272",
+        "name": "ui - add - form",
+        "group": "c8d7c7ef32d2e43c",
+        "label": "Ajouter",
+        "order": 1,
+        "width": 0,
+        "height": 0,
+        "options": [
+            {
+                "label": "Modèle",
+                "key": "model",
+                "type": "dropdown",
+                "required": true,
+                "rows": null
+            },
+            {
+                "label": "Nom",
+                "key": "name",
+                "type": "text",
+                "required": true,
+                "rows": null
+            },
+            {
+                "label": "IP",
+                "key": "ip",
+                "type": "text",
+                "required": true,
+                "rows": null
+            }
+        ],
+        "formValue": {
+            "model": "",
+            "name": "",
+            "ip": ""
+        },
+        "payload": "",
+        "submit": "Ajouter",
+        "cancel": "",
+        "resetOnSubmit": true,
+        "topic": "topic",
+        "topicType": "msg",
+        "splitLayout": "",
+        "className": "",
+        "passthru": false,
+        "dropdownOptions": [
+            {
+                "dropdown": "model",
+                "value": "ECU-B",
+                "label": "ECU-B"
+            },
+            {
+                "dropdown": "model",
+                "value": "ECU-R",
+                "label": "ECU-R"
+            },
+            {
+                "dropdown": "model",
+                "value": "ECU-C",
+                "label": "ECU-C"
+            }
+        ],
+        "x": 440,
+        "y": 1220,
+        "wires": [
+            [
+                "366a2ba9f4f929ce"
+            ]
+        ]
+    },
+    {
+        "id": "78b806cb99572299",
+        "type": "change",
+        "z": "4bc72a1112cb448c",
+        "g": "80eb56db05239272",
+        "name": "clear",
+        "rules": [
+            {
+                "t": "set",
+                "p": "payload",
+                "pt": "msg",
+                "to": "{}",
+                "tot": "jsonata"
+            }
+        ],
+        "action": "",
+        "property": "",
+        "from": "",
+        "to": "",
+        "reg": false,
+        "x": 250,
+        "y": 1220,
+        "wires": [
+            [
+                "bf39d2a0b6757d31"
+            ]
+        ]
+    },
+    {
+        "id": "bb5f28c2a7a9d3ad",
+        "type": "change",
+        "z": "4bc72a1112cb448c",
+        "g": "80eb56db05239272",
+        "name": "write mqtt",
+        "rules": [
+            {
+                "t": "set",
+                "p": "units[msg.payload.name]",
+                "pt": "global",
+                "to": "payload",
+                "tot": "msg"
+            }
+        ],
+        "action": "",
+        "property": "",
+        "from": "",
+        "to": "",
+        "reg": false,
+        "x": 840,
+        "y": 1220,
+        "wires": [
+            [
+                "f9e9e9dd56fec255"
+            ]
+        ]
+    },
+    {
+        "id": "366a2ba9f4f929ce",
+        "type": "function",
+        "z": "4bc72a1112cb448c",
+        "g": "80eb56db05239272",
+        "name": "check values",
+        "func": "// todo\nif (msg.payload.name !== ' ' && msg.payload.ip !== ' ') {\n    return msg;\n}\n\nreturn;",
+        "outputs": 1,
+        "timeout": 0,
+        "noerr": 0,
+        "initialize": "",
+        "finalize": "",
+        "libs": [],
+        "x": 650,
+        "y": 1220,
+        "wires": [
+            [
+                "bb5f28c2a7a9d3ad"
+            ]
+        ]
+    },
+    {
+        "id": "8e74082b23e26d09",
+        "type": "link out",
+        "z": "4bc72a1112cb448c",
+        "g": "80eb56db05239272",
+        "name": "ui - add",
+        "mode": "link",
+        "links": [
+            "b9e756ce9dd6756f"
+        ],
+        "x": 1135,
+        "y": 1220,
+        "wires": []
+    },
+    {
+        "id": "f9e9e9dd56fec255",
+        "type": "delay",
+        "z": "4bc72a1112cb448c",
+        "g": "80eb56db05239272",
+        "name": "50ms",
+        "pauseType": "delay",
+        "timeout": "50",
+        "timeoutUnits": "milliseconds",
+        "rate": "1",
+        "nbRateUnits": "1",
+        "rateUnits": "second",
+        "randomFirst": "1",
+        "randomLast": "5",
+        "randomUnits": "seconds",
+        "drop": false,
+        "allowrate": false,
+        "outputs": 1,
+        "x": 1010,
+        "y": 1220,
+        "wires": [
+            [
+                "8e74082b23e26d09"
+            ]
+        ]
+    },
+    {
+        "id": "335a816d8663d573",
+        "type": "cronplus",
+        "z": "4bc72a1112cb448c",
+        "name": "5m",
+        "outputField": "payload",
+        "timeZone": "",
+        "storeName": "",
+        "commandResponseMsgOutput": "output1",
+        "defaultLocation": "",
+        "defaultLocationType": "default",
+        "outputs": 1,
+        "options": [
+            {
+                "name": "schedule1",
+                "topic": "gate",
+                "payloadType": "default",
+                "payload": "",
+                "expressionType": "cron",
+                "expression": "0 0,5,10,15,20,25,30,35,40,45,50,55 * * * *",
+                "location": "",
+                "offset": "0",
+                "solarType": "all",
+                "solarEvents": "sunrise,sunset"
+            }
+        ],
+        "x": 170,
+        "y": 360,
+        "wires": [
+            [
+                "3538a60e6e05ade1"
+            ]
+        ]
+    },
+    {
+        "id": "cd522600a32e953e",
+        "type": "debug",
+        "z": "4bc72a1112cb448c",
+        "name": "debug 2",
+        "active": true,
+        "tosidebar": true,
+        "console": false,
+        "tostatus": false,
+        "complete": "true",
+        "targetType": "full",
+        "statusVal": "",
+        "statusType": "auto",
+        "x": 560,
+        "y": 360,
+        "wires": []
+    },
+    {
+        "id": "3538a60e6e05ade1",
+        "type": "function",
+        "z": "4bc72a1112cb448c",
+        "name": "parse buffer",
+        "func": "function apsError(start) {\n    throw new Error(`Données insuffisantes à la position ${start}`);\n}\n\nfunction apsStr(buffer, start, amount) {\n    if ((start + amount) > buffer.length) apsError(start);\n\n    return buffer\n        .subarray(start, start + amount)\n        .toString(\"ascii\");\n}\n\nfunction apsUid(buffer, start) {\n    if ((start + 12) > buffer.length) apsError(start);\n\n    return buffer\n        .subarray(start, start + 12)\n        .toString(\"ascii\");\n}\n\nfunction apsInt(buffer, start) {\n    if ((start + 2) > buffer.length) apsError(start);\n\n    return buffer.readUInt16BE(start);\n}\n\nfunction apsDouble(buffer, start) {\n    if ((start + 4) > buffer.length) apsError(start);\n\n    return buffer.readUInt32BE(start);\n}\n\nfunction apsShort(buffer, start) {\n    try {\n        return parseInt(buffer.subarray(start, start + 1).toString('hex'), 8);\n    } catch (err) {\n        apsError(start);\n    }\n}\n\nif (typeof msg.data !== 'object') {\n    // Grab known ECU IP\n    let units = global.get('units', 'default');\n    if (typeof units === 'object') {\n        for (const name in units) {\n            node.send([{\n                'topic': name,\n                'host': units[name]['ip'],\n                'port': '8899',\n                'payload': \"APS1100160001\" + \"END\\n\",\n                'data': {}\n            }, null]);\n        }\n    }\n\n    return;\n}\n\nif (typeof msg.data.ecu !== 'object') {\n\n    // Parse ECU data\n    let buf = Buffer.from(msg.payload);\n    msg.data = {\n        'ecu': {\n            'id': '',\n            'type': 0,\n            'energy_total': 0,\n            'energy_today': 0,\n            'power_instant': 0,\n            'inverters_number': 0,\n            'inverters_online': 0\n        }\n    }\n\n    if (apsStr(buf, 9, 4) === \"0001\") {\n        msg.data.ecu.id = apsStr(buf, 13, 12);\n        msg.data.ecu.type = Number(apsStr(buf, 25, 2)); // 1 or 2\n        msg.data.ecu.energy_total = apsDouble(buf, 27) / 10;\n        msg.data.ecu.power_instant = apsDouble(buf, 31)\n        msg.data.ecu.energy_today = apsDouble(buf, 35) / 100;\n\n        if (msg.data.ecu.type === 1) {\n            msg.data.ecu.inverters_number = apsInt(buf, 46);\n            msg.data.ecu.inverters_online = apsInt(buf, 48);\n        }\n        else if (msg.data.ecu.type === 2) {\n            msg.data.ecu.inverters_number = apsInt(buf, 39);\n            msg.data.ecu.inverters_online = apsInt(buf, 41);\n        }\n\n        // prepare Inverter query\n        if (msg.data.ecu.inverters_number > 0) {\n            msg.payload = \"APS1100280002\" + msg.data.ecu.id + \"END\\n\";\n        \n            node.send([msg, null]);\n        } else {\n            node.send([null, msg]);\n        }\n    }\n\n    return\n}\nelse {\n\n    // Parse Inverter data\n    let buf = Buffer.from(msg.payload);\n    msg.data.inverters = {}\n\n    if (apsStr(buf, 9, 4) === \"0002\") {\n        let offset1 = 0;\n        let offset2 = 26;\n\n        if (apsStr(buf, 14, 2) == \"00\") {\n            while (offset1 < apsInt(buf, 17)) {\n                if (apsStr(buf, 15, 2) == \"01\") {\n                    msg.data.inverters[offset1] = {\n                        'id': apsUid(buf, offset2),\n                        'type': Number(apsStr(buf, offset2 + 7, 2)),\n                        'online': apsShort(buf, offset2 + 6),\n                        'temperature': 0\n                    };\n\n                    // common\n                    if (msg.data.inverters[offset1]['type'] in [1, 2, 3, 4, 5]) {\n                        msg.data.inverters[offset1]['frequency'] = apsInt(buf, offset2 + 9) / 10;\n\n                        if (msg.data.inverters[offset1]['online'] === 1) {\n                            msg.data.inverters[offset1]['temperature'] = apsInt(buf, offset2 + 11) - 100;\n                        }\n                    }\n\n                    if (msg.data.inverters[offset1]['type'] in [1, 4, 5]) {\n\n                        offset2 = offset2 + 21;\n                    }\n                    else if (msg.data.inverters[offset1]['type'] === 2) {\n\n                        offset2 = offset2 + 27;\n                    }\n                    else if (msg.data.inverters[offset1]['type'] === 3) {\n\n                        offset2 = offset2 + 23;\n                    }\n                    else {\n                        offset2 = offset2 + 9;\n                    }\n                }\n\n                offset1++;\n            }\n        }\n    }\n    node.send([null, msg]);\n\n    return;\n}\n",
+        "outputs": 2,
+        "timeout": 0,
+        "noerr": 0,
+        "initialize": "",
+        "finalize": "",
+        "libs": [],
+        "x": 370,
+        "y": 360,
+        "wires": [
+            [
+                "d82deb0a07d618ee"
+            ],
+            [
+                "cd522600a32e953e"
+            ]
+        ]
+    },
+    {
+        "id": "d82deb0a07d618ee",
+        "type": "tcp request",
+        "z": "4bc72a1112cb448c",
+        "name": "ECU Queries",
+        "server": "",
+        "port": "",
+        "out": "char",
+        "ret": "buffer",
+        "splitc": "END\\n",
+        "newline": "",
+        "trim": false,
+        "tls": "",
+        "x": 370,
+        "y": 300,
+        "wires": [
+            [
+                "3538a60e6e05ade1"
             ]
         ]
     }
