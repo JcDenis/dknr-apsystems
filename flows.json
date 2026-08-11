@@ -178,6 +178,49 @@
         "h": 202
     },
     {
+        "id": "6b4c2dd3f5df77bd",
+        "type": "group",
+        "z": "4bc72a1112cb448c",
+        "name": "ui - control",
+        "style": {
+            "fill": "#6f2fa0",
+            "fill-opacity": "0.05",
+            "label": true
+        },
+        "nodes": [
+            "01346f67f027524a",
+            "550fd37cdd043e4d",
+            "46d41095c9cd81bb",
+            "da2b76d325ab019b",
+            "cf1550b97074514c",
+            "2cd010eee2da8e29",
+            "15d854d30f0a7418",
+            "7b29ddeea0bf459b",
+            "be9df446e8994af5",
+            "bc17c08e18a403b2",
+            "c03d7fe0c37957cf",
+            "c158788b3b968b34",
+            "263e38e78c31cbec",
+            "91dbd54711396594",
+            "f2ba5712ec8cd4b1",
+            "3fe540fa0313af8e",
+            "f7d3e7cde4634e66",
+            "775ce16511f819d8",
+            "84750319a3a2463b",
+            "9c745b2a8599abf3",
+            "f7441e7b64e4cea3",
+            "bc41c235c2078a23",
+            "7d8de98aa71ecc40",
+            "8c1baae83dae667e",
+            "31b7a11ce646deba",
+            "0a26b25c7f5f0f97"
+        ],
+        "x": 84,
+        "y": 1299,
+        "w": 2222,
+        "h": 442
+    },
+    {
         "id": "df7710b4b2c4e55b",
         "type": "ui-base",
         "name": "Tableau de bord",
@@ -317,7 +360,7 @@
         "group": "8d032322dc675ac9",
         "name": "spacer",
         "tooltip": "",
-        "order": 1,
+        "order": 5,
         "width": "6",
         "height": 1,
         "className": ""
@@ -335,6 +378,39 @@
         "visible": "true",
         "disabled": "false",
         "groupType": "default"
+    },
+    {
+        "id": "eb362ef870a0b497",
+        "type": "ui-spacer",
+        "group": "8d032322dc675ac9",
+        "name": "spacer",
+        "tooltip": "",
+        "order": 7,
+        "width": "6",
+        "height": 1,
+        "className": ""
+    },
+    {
+        "id": "7397e2af04d99987",
+        "type": "ui-spacer",
+        "group": "8d032322dc675ac9",
+        "name": "spacer",
+        "tooltip": "",
+        "order": 2,
+        "width": "6",
+        "height": 1,
+        "className": ""
+    },
+    {
+        "id": "c67d7082a37bfbe3",
+        "type": "ui-spacer",
+        "group": "8d032322dc675ac9",
+        "name": "spacer",
+        "tooltip": "",
+        "order": 9,
+        "width": "6",
+        "height": 1,
+        "className": ""
     },
     {
         "id": "025edbd02daf82d0",
@@ -463,7 +539,8 @@
             "3fa36de74a10eac1",
             "df19be1275e79b1c",
             "f4a2353e5f92576c",
-            "b9e756ce9dd6756f"
+            "b9e756ce9dd6756f",
+            "550fd37cdd043e4d"
         ],
         "x": 315,
         "y": 140,
@@ -1117,7 +1194,7 @@
         "z": "4bc72a1112cb448c",
         "g": "f880574ac1875493",
         "name": "parse buffer",
-        "func": "function apsError(start) {\n    node.status('Error start at: ' + start);\n    throw new Error(`Données insuffisantes à la position ${start}`);\n}\n\nfunction apsStr(buffer, start, amount) {\n    if ((start + amount) > buffer.length) apsError(start);\n\n    return buffer.subarray(start, start + amount).toString('utf8');\n}\n\nfunction apsUid(buffer, start) {\n    if ((start + 12) > buffer.length) apsError(start);\n\n    return buffer.subarray(start, start + 12).toString('hex').slice(0, 12);\n}\n\nfunction apsInt(buffer, start) {\n    if ((start + 2) > buffer.length) apsError(start);\n\n    return buffer.readUInt16BE(start);\n}\n\nfunction apsDouble(buffer, start) {\n    if ((start + 4) > buffer.length) apsError(start);\n\n    return buffer.readUInt32BE(start);\n}\n\nfunction apsShort(buffer, start) {\n    try {\n        return parseInt(buffer.subarray(start, start + 1).toString('hex'), 8);\n    } catch (err) {\n        apsError(start);\n    }\n}\n\nif (typeof msg.data !== 'object') {\n    // Grab known ECU IP\n    let units = global.get('units', 'default');\n    if (typeof units === 'object') {\n        for (const name in units) {\n            node.send([{\n                'topic': name,\n                'host': units[name]['ip'],\n                'port': '8899',\n                'payload': \"APS1100160001\" + \"END\\n\",\n                'data': {}\n            }, null]);\n        }\n    }\n\n    return;\n}\n\nif (typeof msg.data.ecu !== 'object') {\n\n    // Parse ECU data\n    let buf = Buffer.from(msg.payload);\n    node.status({ text: 'buffer length: ' + buf.length});\n\n    msg.data = {\n        'ecu': {\n            'id': '',\n            'name': msg.topic,\n            'host': msg.host,\n            'port': msg.port,\n            'type': 0,\n            'energy_total': 0,\n            'energy_today': 0,\n            'power_instant': 0,\n            'inverters_number': 0,\n            'inverters_online': 0\n        }\n    }\n\n    if (apsStr(buf, 9, 4) === \"0001\") {\n        msg.data.ecu.id = apsStr(buf, 13, 12);\n        msg.data.ecu.type = parseInt(apsStr(buf, 25, 2), 10); // 1 or 2\n        msg.data.ecu.energy_total = apsDouble(buf, 27) / 10;\n        msg.data.ecu.power_instant = apsDouble(buf, 31)\n        msg.data.ecu.energy_today = apsDouble(buf, 35) / 100;\n\n        if (msg.data.ecu.type === 1) {\n            msg.data.ecu.inverters_number = apsInt(buf, 46);\n            msg.data.ecu.inverters_online = apsInt(buf, 48);\n\n            let offset_f = parseInt(apsStr(buf, 52, 3), 10);\n            msg.data.ecu.firmware = apsStr(buf, 55, offset_f);\n            let offset_t = parseInt(apsStr(buf, 55 + offset_f, 3), 10);\n            msg.data.ecu.timezone = apsStr(buf, 58 + offset_f, offset_t);\n\n        }\n        else if (msg.data.ecu.type === 2) {\n            msg.data.ecu.inverters_number = apsInt(buf, 39);\n            msg.data.ecu.inverters_online = apsInt(buf, 41);\n\n            let offset_f = parseInt(apsStr(buf, 49, 3), 10);\n            msg.data.ecu.firmware = apsStr(buf, 52, offset_f);\n        }\n\n        // prepare Inverter query\n        if (msg.data.ecu.inverters_number > 0) {\n            msg.payload = \"APS1100280002\" + msg.data.ecu.id + \"END\\n\";\n        \n            node.send([msg, null]);\n        } else {\n            node.send([null, msg]);\n        }\n    }\n\n    return\n}\nelse {\n\n    // Parse Inverter data\n    let buf = Buffer.from(msg.payload);\n    node.status({ text: 'buffer length: ' + buf.length});\n\n    msg.data.inverters = {}\n\n    if (apsStr(buf, 9, 4) === \"0002\") {\n        let offset1 = 0;\n        let offset2 = 26;\n\n        if (apsStr(buf, 14, 2) == \"00\") {\n            while (offset1 < apsInt(buf, 17)) {\n                if (apsStr(buf, 15, 2) == \"01\") {\n\n                    msg.data.inverters[offset1] = {\n                        'id': apsUid(buf, offset2),\n                        'type': Number(apsStr(buf, offset2 + 7, 2)),\n                        'online': apsShort(buf, offset2 + 6),\n                        'temperature': 0,\n                        'power': [],\n                        'voltage': []\n                    };\n\n                    // common\n                    if (msg.data.inverters[offset1]['type'] in [1, 2, 3, 4, 5]) {\n                        msg.data.inverters[offset1]['frequency'] = apsInt(buf, offset2 + 9) / 10;\n\n                        if (msg.data.inverters[offset1]['online'] === 1) {\n                            msg.data.inverters[offset1]['temperature'] = apsInt(buf, offset2 + 11) - 100;\n                        }\n                        msg.data.inverters[offset1]['power'][0] = apsInt(buf, offset2 + 13);\n                        msg.data.inverters[offset1]['voltage'][0] = apsInt(buf, offset2 + 15);\n                    }\n\n                    if (msg.data.inverters[offset1]['type'] in [1, 4, 5]) {\n\n                        msg.data.inverters[offset1]['model'] = 'YC600/DS3D/DS3-H/DS3/DS3-L';\n                        msg.data.inverters[offset1]['chanel'] = 2;\n                        msg.data.inverters[offset1]['power'][1] = apsInt(buf, offset2 + 17);\n                        msg.data.inverters[offset1]['voltage'][1] = apsInt(buf, offset2 + 19);\n\n                        offset2 = offset2 + 21;\n                    }\n                    else if (msg.data.inverters[offset1]['type'] === 2) {\n\n                        msg.data.inverters[offset1]['model'] = 'YC1000/QT2';\n                        msg.data.inverters[offset1]['chanel'] = 4;\n                        msg.data.inverters[offset1]['power'][1] = apsInt(buf, offset2 + 17);\n                        msg.data.inverters[offset1]['voltage'][1] = apsInt(buf, offset2 + 19);\n                        msg.data.inverters[offset1]['power'][2] = apsInt(buf, offset2 + 21);\n                        msg.data.inverters[offset1]['voltage'][2] = apsInt(buf, offset2 + 23);\n                        msg.data.inverters[offset1]['power'][3] = apsInt(buf, offset2 + 25);\n\n                        offset2 = offset2 + 27;\n                    }\n                    else if (msg.data.inverters[offset1]['type'] === 3) {\n\n                        msg.data.inverters[offset1]['model'] = 'QS1';\n                        msg.data.inverters[offset1]['chanel'] = 4;\n                        msg.data.inverters[offset1]['power'][1] = apsInt(buf, offset2 + 17);\n                        msg.data.inverters[offset1]['power'][2] = apsInt(buf, offset2 + 19);\n                        msg.data.inverters[offset1]['power'][3] = apsInt(buf, offset2 + 21);\n\n                        offset2 = offset2 + 23;\n                    }\n                    else {\n                        offset2 = offset2 + 9;\n                    }\n                }\n\n                offset1++;\n            }\n        }\n    }\n\n    // CLeanup\n    delete msg.host;\n    delete msg.port;\n    msg.topic = global.get('mqtt.topic', 'default') + '/' + msg.topic;\n    msg.payload = msg.data;\n\n    // Global\n    let controls = global.get('controls', 'default');\n    if (typeof controls !== 'object') {\n        controls = {}\n    }\n    controls[msg.payload.ecu.name] = msg.payload;\n    global.set('controls', controls, 'default');\n\n    node.send([null, msg]);\n\n    return;\n}\n",
+        "func": "function apsError(start) {\n    node.status('Error start at: ' + start);\n    throw new Error(`Données insuffisantes à la position ${start}`);\n}\n\nfunction apsStr(buffer, start, amount) {\n    if ((start + amount) > buffer.length) apsError(start);\n\n    return buffer.subarray(start, start + amount).toString('utf8');\n}\n\nfunction apsUid(buffer, start) {\n    if ((start + 12) > buffer.length) apsError(start);\n\n    return buffer.subarray(start, start + 12).toString('hex').slice(0, 12);\n}\n\nfunction apsInt(buffer, start) {\n    if ((start + 2) > buffer.length) apsError(start);\n\n    return buffer.readUInt16BE(start);\n}\n\nfunction apsDouble(buffer, start) {\n    if ((start + 4) > buffer.length) apsError(start);\n\n    return buffer.readUInt32BE(start);\n}\n\nfunction apsShort(buffer, start) {\n    try {\n        return parseInt(buffer.subarray(start, start + 1).toString('hex'), 8);\n    } catch (err) {\n        apsError(start);\n    }\n}\n\nif (typeof msg.data !== 'object') {\n    // Grab known ECU IP\n    let units = global.get('units', 'default');\n    if (typeof units === 'object') {\n        for (const name in units) {\n            node.send([{\n                'topic': name,\n                'host': units[name]['ip'],\n                'port': '8899',\n                'payload': \"APS1100160001\" + \"END\\n\",\n                'data': {}\n            }, null]);\n        }\n    }\n\n    return;\n}\n\nif (typeof msg.data.ecu !== 'object') {\n\n    // Parse ECU data\n    let buf = Buffer.from(msg.payload);\n    node.status({ text: 'buffer length: ' + buf.length});\n\n    msg.data = {\n        'ecu': {\n            'id': '',\n            'name': msg.topic,\n            'host': msg.host,\n            'port': msg.port,\n            'type': 0,\n            'energy_total': 0,\n            'energy_total_unit': 'kWh',\n            'energy_today': 0,\n            'energy_today_unit': 'kWh',\n            'power_instant': 0,\n            'power_instant_unit': 'W',\n            'inverters_quantity': 0,\n            'inverters_online': 0\n        }\n    }\n\n    if (apsStr(buf, 9, 4) === \"0001\") {\n        msg.data.ecu.id = apsStr(buf, 13, 12);\n        msg.data.ecu.type = parseInt(apsStr(buf, 25, 2), 10); // 1 or 2\n        msg.data.ecu.energy_total = apsDouble(buf, 27) / 10;\n        msg.data.ecu.power_instant = apsDouble(buf, 31)\n        msg.data.ecu.energy_today = apsDouble(buf, 35) / 100;\n\n        if (msg.data.ecu.type === 1) {\n            msg.data.ecu.inverters_quantity = apsInt(buf, 46);\n            msg.data.ecu.inverters_online = apsInt(buf, 48);\n\n            let offset_f = parseInt(apsStr(buf, 52, 3), 10);\n            msg.data.ecu.firmware = apsStr(buf, 55, offset_f);\n            let offset_t = parseInt(apsStr(buf, 55 + offset_f, 3), 10);\n            msg.data.ecu.timezone = apsStr(buf, 58 + offset_f, offset_t);\n\n        }\n        else if (msg.data.ecu.type === 2) {\n            msg.data.ecu.inverters_quantity = apsInt(buf, 39);\n            msg.data.ecu.inverters_online = apsInt(buf, 41);\n\n            let offset_f = parseInt(apsStr(buf, 49, 3), 10);\n            msg.data.ecu.firmware = apsStr(buf, 52, offset_f);\n        }\n\n        // prepare Inverter query\n        if (msg.data.ecu.inverters_quantity > 0) {\n            msg.payload = \"APS1100280002\" + msg.data.ecu.id + \"END\\n\";\n        \n            node.send([msg, null]);\n        } else {\n            node.send([null, msg]);\n        }\n    }\n\n    return\n}\nelse {\n\n    // Parse Inverter data\n    let buf = Buffer.from(msg.payload);\n    node.status({ text: 'buffer length: ' + buf.length});\n\n    msg.data.inverters = {}\n\n    if (apsStr(buf, 9, 4) === \"0002\") {\n        let offset1 = 0;\n        let offset2 = 26;\n\n        if (apsStr(buf, 14, 2) == \"00\") {\n            while (offset1 < apsInt(buf, 17)) {\n                if (apsStr(buf, 15, 2) == \"01\") {\n\n                    msg.data.inverters[offset1] = {\n                        'id': apsUid(buf, offset2),\n                        'type': Number(apsStr(buf, offset2 + 7, 2)),\n                        'online': apsShort(buf, offset2 + 6),\n                        'temperature': 0,\n                        'power': [],\n                        'voltage': []\n                    };\n\n                    // common\n                    if (msg.data.inverters[offset1]['type'] in [1, 2, 3, 4, 5]) {\n                        msg.data.inverters[offset1]['frequency'] = apsInt(buf, offset2 + 9) / 10;\n\n                        if (msg.data.inverters[offset1]['online'] === 1) {\n                            msg.data.inverters[offset1]['temperature'] = apsInt(buf, offset2 + 11) - 100;\n                        }\n                        msg.data.inverters[offset1]['power'][0] = apsInt(buf, offset2 + 13);\n                        msg.data.inverters[offset1]['voltage'][0] = apsInt(buf, offset2 + 15);\n                    }\n\n                    if (msg.data.inverters[offset1]['type'] in [1, 4, 5]) {\n\n                        msg.data.inverters[offset1]['model'] = 'YC600/DS3D/DS3-H/DS3/DS3-L';\n                        msg.data.inverters[offset1]['chanel'] = 2;\n                        msg.data.inverters[offset1]['max'] = 2000; // YC600=600VA,DS3D=2000VA,DS3-H=960VA, DS3=880VA, DS3-L=730VA\n                        msg.data.inverters[offset1]['power'][1] = apsInt(buf, offset2 + 17);\n                        msg.data.inverters[offset1]['voltage'][1] = apsInt(buf, offset2 + 19);\n\n                        offset2 = offset2 + 21;\n                    }\n                    else if (msg.data.inverters[offset1]['type'] === 2) {\n\n                        msg.data.inverters[offset1]['model'] = 'YC1000/QT2';\n                        msg.data.inverters[offset1]['chanel'] = 4;\n                        msg.data.inverters[offset1]['max'] = 2000; // YC1000=1000VA, QT2=2000VA\n                        msg.data.inverters[offset1]['power'][1] = apsInt(buf, offset2 + 17);\n                        msg.data.inverters[offset1]['voltage'][1] = apsInt(buf, offset2 + 19);\n                        msg.data.inverters[offset1]['power'][2] = apsInt(buf, offset2 + 21);\n                        msg.data.inverters[offset1]['voltage'][2] = apsInt(buf, offset2 + 23);\n                        msg.data.inverters[offset1]['power'][3] = apsInt(buf, offset2 + 25);\n\n                        offset2 = offset2 + 27;\n                    }\n                    else if (msg.data.inverters[offset1]['type'] === 3) {\n\n                        msg.data.inverters[offset1]['model'] = 'QS1';\n                        msg.data.inverters[offset1]['chanel'] = 4;\n                        msg.data.inverters[offset1]['max'] = 1200; // QS1=1200VA\n                        msg.data.inverters[offset1]['power'][1] = apsInt(buf, offset2 + 17);\n                        msg.data.inverters[offset1]['power'][2] = apsInt(buf, offset2 + 19);\n                        msg.data.inverters[offset1]['power'][3] = apsInt(buf, offset2 + 21);\n\n                        offset2 = offset2 + 23;\n                    }\n                    else {\n                        offset2 = offset2 + 9;\n                    }\n                }\n\n                offset1++;\n            }\n        }\n    }\n\n    // CLeanup\n    delete msg.host;\n    delete msg.port;\n    msg.topic = global.get('mqtt.topic', 'default') + '/' + msg.topic;\n    msg.payload = msg.data;\n\n    // Global\n    let controls = global.get('controls', 'default');\n    if (typeof controls !== 'object') {\n        controls = {}\n    }\n    controls[msg.payload.ecu.name] = msg.payload;\n    global.set('controls', controls, 'default');\n\n    node.send([null, msg]);\n\n    return;\n}\n",
         "outputs": 2,
         "timeout": 0,
         "noerr": 0,
@@ -1181,5 +1258,804 @@
         "x": 355,
         "y": 320,
         "wires": []
+    },
+    {
+        "id": "01346f67f027524a",
+        "type": "delay",
+        "z": "4bc72a1112cb448c",
+        "g": "6b4c2dd3f5df77bd",
+        "name": "50ms",
+        "pauseType": "delay",
+        "timeout": "50",
+        "timeoutUnits": "milliseconds",
+        "rate": "1",
+        "nbRateUnits": "1",
+        "rateUnits": "second",
+        "randomFirst": "1",
+        "randomLast": "5",
+        "randomUnits": "seconds",
+        "drop": false,
+        "allowrate": false,
+        "outputs": 1,
+        "x": 1790,
+        "y": 1340,
+        "wires": [
+            [
+                "f2ba5712ec8cd4b1"
+            ]
+        ]
+    },
+    {
+        "id": "550fd37cdd043e4d",
+        "type": "link in",
+        "z": "4bc72a1112cb448c",
+        "g": "6b4c2dd3f5df77bd",
+        "name": "ui - control",
+        "links": [
+            "92c098c716e46e3b",
+            "f2ba5712ec8cd4b1"
+        ],
+        "x": 125,
+        "y": 1700,
+        "wires": [
+            [
+                "46d41095c9cd81bb",
+                "7b29ddeea0bf459b"
+            ]
+        ]
+    },
+    {
+        "id": "46d41095c9cd81bb",
+        "type": "function",
+        "z": "4bc72a1112cb448c",
+        "g": "6b4c2dd3f5df77bd",
+        "name": "get names",
+        "func": "flow.set('current_ecu', '', 'default');\n\nmsg.payload = '';\nmsg.class = '';\nmsg.enabled = true;\nmsg.options = [{\n    'label':'',\n    'value':'',\n    'dropdown':'name'\n}];\n\nlet i = 1;\nlet units = global.get('units', 'default');\nif (typeof units === 'object') {\n    for(const name in units) {\n        msg.options[i++] = {\n            'label':name,\n            'value':name,\n            'dropdown':'name'\n        }\n    }\n}\n\nreturn msg;",
+        "outputs": 1,
+        "timeout": 0,
+        "noerr": 0,
+        "initialize": "",
+        "finalize": "",
+        "libs": [],
+        "x": 290,
+        "y": 1640,
+        "wires": [
+            [
+                "da2b76d325ab019b"
+            ]
+        ]
+    },
+    {
+        "id": "da2b76d325ab019b",
+        "type": "ui-dropdown",
+        "z": "4bc72a1112cb448c",
+        "g": "6b4c2dd3f5df77bd",
+        "group": "8d032322dc675ac9",
+        "name": "ui - control - name",
+        "label": "Sélectionner un onduleur",
+        "tooltip": "",
+        "order": 1,
+        "width": "3",
+        "height": "1",
+        "passthru": false,
+        "multiple": false,
+        "chips": false,
+        "clearable": false,
+        "options": [
+            {
+                "label": "",
+                "value": "",
+                "type": "str"
+            }
+        ],
+        "payload": "",
+        "topic": "topic",
+        "topicType": "msg",
+        "className": "",
+        "typeIsComboBox": true,
+        "msgTrigger": "onChange",
+        "x": 510,
+        "y": 1640,
+        "wires": [
+            [
+                "cf1550b97074514c"
+            ]
+        ]
+    },
+    {
+        "id": "cf1550b97074514c",
+        "type": "switch",
+        "z": "4bc72a1112cb448c",
+        "g": "6b4c2dd3f5df77bd",
+        "name": "empty",
+        "property": "payload",
+        "propertyType": "msg",
+        "rules": [
+            {
+                "t": "nempty"
+            },
+            {
+                "t": "else"
+            }
+        ],
+        "checkall": "false",
+        "repair": false,
+        "outputs": 2,
+        "x": 710,
+        "y": 1640,
+        "wires": [
+            [
+                "2cd010eee2da8e29"
+            ],
+            [
+                "7b29ddeea0bf459b"
+            ]
+        ]
+    },
+    {
+        "id": "2cd010eee2da8e29",
+        "type": "switch",
+        "z": "4bc72a1112cb448c",
+        "g": "6b4c2dd3f5df77bd",
+        "name": "exists",
+        "property": "controls",
+        "propertyType": "global",
+        "rules": [
+            {
+                "t": "hask",
+                "v": "payload",
+                "vt": "msg"
+            },
+            {
+                "t": "else"
+            }
+        ],
+        "checkall": "false",
+        "repair": false,
+        "outputs": 2,
+        "x": 870,
+        "y": 1580,
+        "wires": [
+            [
+                "c158788b3b968b34",
+                "15d854d30f0a7418"
+            ],
+            [
+                "7b29ddeea0bf459b"
+            ]
+        ]
+    },
+    {
+        "id": "15d854d30f0a7418",
+        "type": "change",
+        "z": "4bc72a1112cb448c",
+        "g": "6b4c2dd3f5df77bd",
+        "name": "show",
+        "rules": [
+            {
+                "t": "set",
+                "p": "payload",
+                "pt": "msg",
+                "to": "",
+                "tot": "str"
+            },
+            {
+                "t": "set",
+                "p": "class",
+                "pt": "msg",
+                "to": "",
+                "tot": "str"
+            },
+            {
+                "t": "set",
+                "p": "enabled",
+                "pt": "msg",
+                "to": "true",
+                "tot": "bool"
+            }
+        ],
+        "action": "",
+        "property": "",
+        "from": "",
+        "to": "",
+        "reg": false,
+        "x": 1230,
+        "y": 1580,
+        "wires": [
+            [
+                "263e38e78c31cbec"
+            ]
+        ]
+    },
+    {
+        "id": "7b29ddeea0bf459b",
+        "type": "change",
+        "z": "4bc72a1112cb448c",
+        "g": "6b4c2dd3f5df77bd",
+        "name": "hide",
+        "rules": [
+            {
+                "t": "set",
+                "p": "payload",
+                "pt": "msg",
+                "to": "",
+                "tot": "str"
+            },
+            {
+                "t": "set",
+                "p": "class",
+                "pt": "msg",
+                "to": "remove",
+                "tot": "str"
+            },
+            {
+                "t": "set",
+                "p": "enabled",
+                "pt": "msg",
+                "to": "false",
+                "tot": "bool"
+            }
+        ],
+        "action": "",
+        "property": "",
+        "from": "",
+        "to": "",
+        "reg": false,
+        "x": 1230,
+        "y": 1700,
+        "wires": [
+            [
+                "263e38e78c31cbec",
+                "84750319a3a2463b",
+                "f7d3e7cde4634e66",
+                "f7441e7b64e4cea3",
+                "31b7a11ce646deba"
+            ]
+        ]
+    },
+    {
+        "id": "be9df446e8994af5",
+        "type": "change",
+        "z": "4bc72a1112cb448c",
+        "g": "6b4c2dd3f5df77bd",
+        "name": "ecu",
+        "rules": [
+            {
+                "t": "set",
+                "p": "payload",
+                "pt": "msg",
+                "to": "topic",
+                "tot": "msg"
+            }
+        ],
+        "action": "",
+        "property": "",
+        "from": "",
+        "to": "",
+        "reg": false,
+        "x": 530,
+        "y": 1520,
+        "wires": [
+            [
+                "bc17c08e18a403b2"
+            ]
+        ]
+    },
+    {
+        "id": "bc17c08e18a403b2",
+        "type": "delay",
+        "z": "4bc72a1112cb448c",
+        "g": "6b4c2dd3f5df77bd",
+        "name": "1s",
+        "pauseType": "delay",
+        "timeout": "1",
+        "timeoutUnits": "seconds",
+        "rate": "1",
+        "nbRateUnits": "1",
+        "rateUnits": "second",
+        "randomFirst": "1",
+        "randomLast": "5",
+        "randomUnits": "seconds",
+        "drop": false,
+        "allowrate": false,
+        "outputs": 1,
+        "x": 690,
+        "y": 1520,
+        "wires": [
+            [
+                "c03d7fe0c37957cf"
+            ]
+        ]
+    },
+    {
+        "id": "c03d7fe0c37957cf",
+        "type": "switch",
+        "z": "4bc72a1112cb448c",
+        "g": "6b4c2dd3f5df77bd",
+        "name": "current",
+        "property": "current_ecu",
+        "propertyType": "flow",
+        "rules": [
+            {
+                "t": "eq",
+                "v": "payload",
+                "vt": "msg"
+            }
+        ],
+        "checkall": "false",
+        "repair": false,
+        "outputs": 1,
+        "x": 860,
+        "y": 1520,
+        "wires": [
+            [
+                "c158788b3b968b34"
+            ]
+        ]
+    },
+    {
+        "id": "c158788b3b968b34",
+        "type": "change",
+        "z": "4bc72a1112cb448c",
+        "g": "6b4c2dd3f5df77bd",
+        "name": "global",
+        "rules": [
+            {
+                "t": "set",
+                "p": "current_ecu",
+                "pt": "flow",
+                "to": "payload",
+                "tot": "msg"
+            },
+            {
+                "t": "set",
+                "p": "payload",
+                "pt": "msg",
+                "to": "controls[msg.payload]",
+                "tot": "global"
+            }
+        ],
+        "action": "",
+        "property": "",
+        "from": "",
+        "to": "",
+        "reg": false,
+        "x": 1030,
+        "y": 1520,
+        "wires": [
+            [
+                "3fe540fa0313af8e",
+                "775ce16511f819d8",
+                "9c745b2a8599abf3"
+            ]
+        ]
+    },
+    {
+        "id": "263e38e78c31cbec",
+        "type": "ui-button",
+        "z": "4bc72a1112cb448c",
+        "g": "6b4c2dd3f5df77bd",
+        "group": "8d032322dc675ac9",
+        "name": "ui - control - delete",
+        "label": "Supprimer",
+        "order": 10,
+        "width": "3",
+        "height": "1",
+        "emulateClick": false,
+        "tooltip": "",
+        "color": "",
+        "bgcolor": "",
+        "className": "",
+        "icon": "",
+        "iconPosition": "left",
+        "payload": "",
+        "payloadType": "str",
+        "topic": "topic",
+        "topicType": "msg",
+        "buttonColor": "",
+        "textColor": "",
+        "iconColor": "",
+        "enableClick": true,
+        "enablePointerdown": false,
+        "pointerdownPayload": "",
+        "pointerdownPayloadType": "str",
+        "enablePointerup": false,
+        "pointerupPayload": "",
+        "pointerupPayloadType": "str",
+        "x": 1430,
+        "y": 1340,
+        "wires": [
+            [
+                "91dbd54711396594"
+            ]
+        ]
+    },
+    {
+        "id": "91dbd54711396594",
+        "type": "change",
+        "z": "4bc72a1112cb448c",
+        "g": "6b4c2dd3f5df77bd",
+        "name": "delete",
+        "rules": [
+            {
+                "t": "set",
+                "p": "payload",
+                "pt": "msg",
+                "to": "current_ecu",
+                "tot": "flow"
+            },
+            {
+                "t": "delete",
+                "p": "units[msg.payload]",
+                "pt": "global"
+            }
+        ],
+        "action": "",
+        "property": "",
+        "from": "",
+        "to": "",
+        "reg": false,
+        "x": 1630,
+        "y": 1340,
+        "wires": [
+            [
+                "01346f67f027524a"
+            ]
+        ]
+    },
+    {
+        "id": "f2ba5712ec8cd4b1",
+        "type": "link out",
+        "z": "4bc72a1112cb448c",
+        "g": "6b4c2dd3f5df77bd",
+        "name": "ui - hvac - delete",
+        "mode": "link",
+        "links": [
+            "550fd37cdd043e4d"
+        ],
+        "x": 1915,
+        "y": 1340,
+        "wires": []
+    },
+    {
+        "id": "3fe540fa0313af8e",
+        "type": "function",
+        "z": "4bc72a1112cb448c",
+        "g": "6b4c2dd3f5df77bd",
+        "name": "ecu info",
+        "func": "let res = [];\nlet i = 0;\nlet exists = false;\n\nif (typeof msg.payload.ecu.id == 'string') {\n    res[i++] = {\n        'lbl': 'Identifiant',\n        'val': msg.payload.ecu.id\n    };\n    exists = true;\n}\n\nif (typeof msg.payload.ecu.firmware == 'string') {\n    res[i++] = {\n        'lbl': 'Version',\n        'val': msg.payload.ecu.firmware\n    }\n    exists = true;\n}\n\nif (typeof msg.payload.ecu.timezone == 'string') {\n    res[i++] = {\n        'lbl': 'Fuseau horaire',\n        'val': msg.payload.ecu.timezone,\n    }\n    exists = true;\n}\n\nif (typeof msg.payload.ecu.inverters_quantity == 'number') {\n    res[i++] = {\n        'lbl': \"Nombre d'onduleurs configurés\",\n        'val': msg.payload.ecu.inverters_quantity,\n    }\n    exists = true;\n}\n\nif (exists === true) {\n    msg.payload = res;\n    msg.class = '';\n\n    return msg;\n}\n\nreturn;",
+        "outputs": 1,
+        "timeout": 0,
+        "noerr": 0,
+        "initialize": "",
+        "finalize": "",
+        "libs": [],
+        "x": 1220,
+        "y": 1400,
+        "wires": [
+            [
+                "f7d3e7cde4634e66"
+            ]
+        ]
+    },
+    {
+        "id": "f7d3e7cde4634e66",
+        "type": "ui-table",
+        "z": "4bc72a1112cb448c",
+        "g": "6b4c2dd3f5df77bd",
+        "group": "8d032322dc675ac9",
+        "name": "ui - control - ecu info table",
+        "label": "ECU",
+        "order": 3,
+        "width": "3",
+        "height": "1",
+        "maxrows": 0,
+        "passthru": false,
+        "autocols": false,
+        "showSearch": false,
+        "deselect": true,
+        "selectionType": "click",
+        "columns": [
+            {
+                "title": "",
+                "key": "lbl",
+                "keyType": "key",
+                "type": "text",
+                "width": "40%",
+                "align": "end"
+            },
+            {
+                "title": "",
+                "key": "val",
+                "keyType": "key",
+                "type": "text",
+                "width": "",
+                "align": "start"
+            }
+        ],
+        "mobileBreakpoint": "sm",
+        "mobileBreakpointType": "defaults",
+        "action": "replace",
+        "className": "",
+        "x": 1450,
+        "y": 1400,
+        "wires": [
+            []
+        ]
+    },
+    {
+        "id": "775ce16511f819d8",
+        "type": "function",
+        "z": "4bc72a1112cb448c",
+        "g": "6b4c2dd3f5df77bd",
+        "name": "ecu energy",
+        "func": "let res = [];\nlet i = 0;\nlet exists = false;\n\nif (typeof msg.payload.ecu.energy_total == 'number') {\n    res[i++] = {\n        'lbl': 'Production totale',\n        'val': msg.payload.ecu.energy_total + ' ' + msg.payload.ecu.energy_total_unit\n    };\n    exists = true;\n}\n\nif (typeof msg.payload.ecu.energy_today == 'number') {\n    res[i++] = {\n        'lbl': 'Production du jour',\n        'val': msg.payload.ecu.energy_today + ' ' + msg.payload.ecu.energy_today_unit\n    }\n    exists = true;\n}\n\nif (typeof msg.payload.ecu.power_instant == 'number') {\n    res[i++] = {\n        'lbl': 'Puissance instantanée',\n        'val': msg.payload.ecu.power_instant + ' ' + msg.payload.ecu.power_instant_unit,\n    }\n    exists = true;\n}\n\nif (typeof msg.payload.ecu.inverters_online == 'number') {\n    res[i++] = {\n        'lbl': \"Nombre d'onduleurs en ligne\",\n        'val': msg.payload.ecu.inverters_online,\n    }\n    exists = true;\n}\n\nif (exists === true) {\n    msg.payload = res;\n    msg.class = '';\n\n    return msg;\n}\n\nreturn;",
+        "outputs": 1,
+        "timeout": 0,
+        "noerr": 0,
+        "initialize": "",
+        "finalize": "",
+        "libs": [],
+        "x": 1210,
+        "y": 1460,
+        "wires": [
+            [
+                "84750319a3a2463b"
+            ]
+        ]
+    },
+    {
+        "id": "84750319a3a2463b",
+        "type": "ui-table",
+        "z": "4bc72a1112cb448c",
+        "g": "6b4c2dd3f5df77bd",
+        "group": "8d032322dc675ac9",
+        "name": "ui - control - ecu energy table",
+        "label": "Production",
+        "order": 4,
+        "width": "3",
+        "height": "1",
+        "maxrows": 0,
+        "passthru": false,
+        "autocols": false,
+        "showSearch": false,
+        "deselect": true,
+        "selectionType": "click",
+        "columns": [
+            {
+                "title": "",
+                "key": "lbl",
+                "keyType": "key",
+                "type": "text",
+                "width": "40%",
+                "align": "end"
+            },
+            {
+                "title": "",
+                "key": "val",
+                "keyType": "key",
+                "type": "text",
+                "width": "",
+                "align": "start"
+            }
+        ],
+        "mobileBreakpoint": "sm",
+        "mobileBreakpointType": "defaults",
+        "action": "replace",
+        "className": "",
+        "x": 1460,
+        "y": 1460,
+        "wires": [
+            []
+        ]
+    },
+    {
+        "id": "9c745b2a8599abf3",
+        "type": "function",
+        "z": "4bc72a1112cb448c",
+        "g": "6b4c2dd3f5df77bd",
+        "name": "inverters",
+        "func": "flow.set('current_inverter', '', 'default');\nlet data = msg.payload;\n\nmsg.payload = '';\nmsg.class = '';\nmsg.enabled = true;\nmsg.options = [{\n    'label':'',\n    'value':'',\n    'dropdown':'name'\n}];\n\nlet i = 1;\nlet inverters = data.inverters;\nif (typeof inverters === 'object') {\n    for(const k in inverters) {\n        msg.options[i++] = {\n            'label': inverters[k]['id'],\n            'value': inverters[k]['id'],\n            'dropdown':'name'\n        }\n    }\n}\n\nreturn msg;",
+        "outputs": 1,
+        "timeout": 0,
+        "noerr": 0,
+        "initialize": "",
+        "finalize": "",
+        "libs": [],
+        "x": 1220,
+        "y": 1520,
+        "wires": [
+            [
+                "f7441e7b64e4cea3"
+            ]
+        ]
+    },
+    {
+        "id": "f7441e7b64e4cea3",
+        "type": "ui-dropdown",
+        "z": "4bc72a1112cb448c",
+        "g": "6b4c2dd3f5df77bd",
+        "group": "8d032322dc675ac9",
+        "name": "ui - control - inverter select",
+        "label": "Sélectionner un micro-onduleur",
+        "tooltip": "",
+        "order": 6,
+        "width": "3",
+        "height": "1",
+        "passthru": false,
+        "multiple": false,
+        "chips": false,
+        "clearable": false,
+        "options": [
+            {
+                "label": "",
+                "value": "",
+                "type": "str"
+            }
+        ],
+        "payload": "",
+        "topic": "topic",
+        "topicType": "msg",
+        "className": "",
+        "typeIsComboBox": false,
+        "msgTrigger": "onChange",
+        "x": 1460,
+        "y": 1520,
+        "wires": [
+            [
+                "7d8de98aa71ecc40"
+            ]
+        ]
+    },
+    {
+        "id": "bc41c235c2078a23",
+        "type": "debug",
+        "z": "4bc72a1112cb448c",
+        "g": "6b4c2dd3f5df77bd",
+        "name": "debug 1",
+        "active": true,
+        "tosidebar": true,
+        "console": false,
+        "tostatus": false,
+        "complete": "true",
+        "targetType": "full",
+        "statusVal": "",
+        "statusType": "auto",
+        "x": 2080,
+        "y": 1460,
+        "wires": []
+    },
+    {
+        "id": "7d8de98aa71ecc40",
+        "type": "function",
+        "z": "4bc72a1112cb448c",
+        "g": "6b4c2dd3f5df77bd",
+        "name": "inverter",
+        "func": "let control = flow.get('current_ecu');\nlet inverters = global.get('controls[\"' + control + '\"][\"inverters\"]', 'default');\nif (typeof inverters === 'object' ) {\n    for(const k in inverters) {\n        if (inverters[k].id === msg.payload) {\n            msg.payload = inverters[k];\n\n            node.send([msg, null]);\n        }\n    }\n}\n\nnode.send(null, msg);\n\nreturn;",
+        "outputs": 2,
+        "timeout": 0,
+        "noerr": 0,
+        "initialize": "",
+        "finalize": "",
+        "libs": [],
+        "x": 1700,
+        "y": 1520,
+        "wires": [
+            [
+                "8c1baae83dae667e"
+            ],
+            [
+                "31b7a11ce646deba"
+            ]
+        ]
+    },
+    {
+        "id": "8c1baae83dae667e",
+        "type": "function",
+        "z": "4bc72a1112cb448c",
+        "g": "6b4c2dd3f5df77bd",
+        "name": "inverter info",
+        "func": "let res = [];\nlet i = 0;\nlet exists = false;\n\nif (typeof msg.payload.id == 'string') {\n    res[i++] = {\n        'lbl': 'Identifiant',\n        'val': msg.payload.id\n    };\n    exists = true;\n}\n\nif (typeof msg.payload.model == 'string') {\n    res[i++] = {\n        'lbl': 'Famille de modèle',\n        'val': msg.payload.model\n    }\n    exists = true;\n}\n\nif (typeof msg.payload.chanel == 'number') {\n    res[i++] = {\n        'lbl': 'Nombre de canaux',\n        'val': msg.payload.chanel,\n    }\n    exists = true;\n}\n\nif (typeof msg.payload.online == 'number') {\n    res[i++] = {\n        'lbl': 'En ligne',\n        'val': msg.payload.online == 0 ? 'Non' : 'Oui',\n    }\n    exists = true;\n}\n\nif (typeof msg.payload.temperature == 'number') {\n    res[i++] = {\n        'lbl': 'Température',\n        'val': msg.payload.temperature + ' °C',\n    }\n    exists = true;\n}\n\nif (exists === true) {\n    msg.payload = res;\n    msg.class = '';\n\n    return msg;\n}\n\nreturn;",
+        "outputs": 1,
+        "timeout": 0,
+        "noerr": 0,
+        "initialize": "",
+        "finalize": "",
+        "libs": [],
+        "x": 1890,
+        "y": 1520,
+        "wires": [
+            [
+                "bc41c235c2078a23",
+                "0a26b25c7f5f0f97"
+            ]
+        ]
+    },
+    {
+        "id": "31b7a11ce646deba",
+        "type": "change",
+        "z": "4bc72a1112cb448c",
+        "g": "6b4c2dd3f5df77bd",
+        "name": "hide",
+        "rules": [
+            {
+                "t": "set",
+                "p": "payload",
+                "pt": "msg",
+                "to": "",
+                "tot": "str"
+            },
+            {
+                "t": "set",
+                "p": "class",
+                "pt": "msg",
+                "to": "remove",
+                "tot": "str"
+            },
+            {
+                "t": "set",
+                "p": "enabled",
+                "pt": "msg",
+                "to": "false",
+                "tot": "bool"
+            }
+        ],
+        "action": "",
+        "property": "",
+        "from": "",
+        "to": "",
+        "reg": false,
+        "x": 1910,
+        "y": 1700,
+        "wires": [
+            [
+                "0a26b25c7f5f0f97"
+            ]
+        ]
+    },
+    {
+        "id": "0a26b25c7f5f0f97",
+        "type": "ui-table",
+        "z": "4bc72a1112cb448c",
+        "g": "6b4c2dd3f5df77bd",
+        "group": "8d032322dc675ac9",
+        "name": "ui - control - inverter info table",
+        "label": "Mirco-onduleur",
+        "order": 8,
+        "width": "3",
+        "height": "1",
+        "maxrows": 0,
+        "passthru": false,
+        "autocols": false,
+        "showSearch": false,
+        "deselect": true,
+        "selectionType": "click",
+        "columns": [
+            {
+                "title": "",
+                "key": "lbl",
+                "keyType": "key",
+                "type": "text",
+                "width": "40%",
+                "align": "end"
+            },
+            {
+                "title": "",
+                "key": "val",
+                "keyType": "key",
+                "type": "text",
+                "width": "",
+                "align": "start"
+            }
+        ],
+        "mobileBreakpoint": "sm",
+        "mobileBreakpointType": "defaults",
+        "action": "replace",
+        "className": "",
+        "x": 2150,
+        "y": 1520,
+        "wires": [
+            []
+        ]
     }
 ]
