@@ -156,6 +156,28 @@
         "h": 82
     },
     {
+        "id": "f880574ac1875493",
+        "type": "group",
+        "z": "4bc72a1112cb448c",
+        "name": "kernel - control",
+        "style": {
+            "fill": "#ff0000",
+            "fill-opacity": "0.05",
+            "label": true
+        },
+        "nodes": [
+            "335a816d8663d573",
+            "cd522600a32e953e",
+            "3538a60e6e05ade1",
+            "d82deb0a07d618ee",
+            "0bf80703420c701e"
+        ],
+        "x": 94,
+        "y": 219,
+        "w": 452,
+        "h": 202
+    },
+    {
         "id": "df7710b4b2c4e55b",
         "type": "ui-base",
         "name": "Tableau de bord",
@@ -250,7 +272,7 @@
         "name": "MQTT",
         "broker": "192.168.0.11",
         "port": "1883",
-        "clientid": "dkteleinfo",
+        "clientid": "dkapsystems",
         "autoConnect": true,
         "usetls": false,
         "protocolVersion": 4,
@@ -372,7 +394,9 @@
         "z": "4bc72a1112cb448c",
         "g": "9e3dbf7ae870765f",
         "name": "kernel - mqtt send",
-        "links": [],
+        "links": [
+            "0bf80703420c701e"
+        ],
         "x": 125,
         "y": 680,
         "wires": [
@@ -1038,6 +1062,7 @@
         "id": "335a816d8663d573",
         "type": "cronplus",
         "z": "4bc72a1112cb448c",
+        "g": "f880574ac1875493",
         "name": "5m",
         "outputField": "payload",
         "timeZone": "",
@@ -1060,8 +1085,8 @@
                 "solarEvents": "sunrise,sunset"
             }
         ],
-        "x": 350,
-        "y": 300,
+        "x": 190,
+        "y": 260,
         "wires": [
             [
                 "3538a60e6e05ade1"
@@ -1072,8 +1097,9 @@
         "id": "cd522600a32e953e",
         "type": "debug",
         "z": "4bc72a1112cb448c",
-        "name": "debug 2",
-        "active": true,
+        "g": "f880574ac1875493",
+        "name": "kernel - control",
+        "active": false,
         "tosidebar": true,
         "console": false,
         "tostatus": false,
@@ -1081,30 +1107,32 @@
         "targetType": "full",
         "statusVal": "",
         "statusType": "auto",
-        "x": 560,
-        "y": 360,
+        "x": 420,
+        "y": 380,
         "wires": []
     },
     {
         "id": "3538a60e6e05ade1",
         "type": "function",
         "z": "4bc72a1112cb448c",
+        "g": "f880574ac1875493",
         "name": "parse buffer",
-        "func": "function apsError(start) {\n    node.status('Error start at: ' + start);\n    throw new Error(`Données insuffisantes à la position ${start}`);\n}\n\nfunction apsStr(buffer, start, amount) {\n    if ((start + amount) > buffer.length) apsError(start);\n\n    return buffer.subarray(start, start + amount).toString('utf8');\n}\n\nfunction apsUid(buffer, start) {\n    if ((start + 12) > buffer.length) apsError(start);\n\n    return buffer.subarray(start, start + 12).toString('hex').slice(0, 12);\n}\n\nfunction apsInt(buffer, start) {\n    if ((start + 2) > buffer.length) apsError(start);\n\n    return buffer.readUInt16BE(start);\n}\n\nfunction apsDouble(buffer, start) {\n    if ((start + 4) > buffer.length) apsError(start);\n\n    return buffer.readUInt32BE(start);\n}\n\nfunction apsShort(buffer, start) {\n    try {\n        return parseInt(buffer.subarray(start, start + 1).toString('hex'), 8);\n    } catch (err) {\n        apsError(start);\n    }\n}\n\nif (typeof msg.data !== 'object') {\n    // Grab known ECU IP\n    let units = global.get('units', 'default');\n    if (typeof units === 'object') {\n        for (const name in units) {\n            node.send([{\n                'topic': name,\n                'host': units[name]['ip'],\n                'port': '8899',\n                'payload': \"APS1100160001\" + \"END\\n\",\n                'data': {}\n            }, null]);\n        }\n    }\n\n    return;\n}\n\nif (typeof msg.data.ecu !== 'object') {\n\n    // Parse ECU data\n    let buf = Buffer.from(msg.payload);\n    node.status({ text: 'buffer length: ' + buf.length});\n    msg.data = {\n        'ecu': {\n            'id': '',\n            'type': 0,\n            'energy_total': 0,\n            'energy_today': 0,\n            'power_instant': 0,\n            'inverters_number': 0,\n            'inverters_online': 0\n        }\n    }\n\n    if (apsStr(buf, 9, 4) === \"0001\") {\n        msg.data.ecu.id = apsStr(buf, 13, 12);\n        msg.data.ecu.type = parseInt(apsStr(buf, 25, 2), 10); // 1 or 2\n        msg.data.ecu.energy_total = apsDouble(buf, 27) / 10;\n        msg.data.ecu.power_instant = apsDouble(buf, 31)\n        msg.data.ecu.energy_today = apsDouble(buf, 35) / 100;\n\n        if (msg.data.ecu.type === 1) {\n            msg.data.ecu.inverters_number = apsInt(buf, 46);\n            msg.data.ecu.inverters_online = apsInt(buf, 48);\n\n            let offset_f = parseInt(apsStr(buf, 52, 3), 10);\n            msg.data.ecu.firmware = apsStr(buf, 55, offset_f);\n            let offset_t = parseInt(apsStr(buf, 55 + offset_f, 3), 10);\n            msg.data.ecu.timezone = apsStr(buf, 58 + offset_f, offset_t);\n\n        }\n        else if (msg.data.ecu.type === 2) {\n            msg.data.ecu.inverters_number = apsInt(buf, 39);\n            msg.data.ecu.inverters_online = apsInt(buf, 41);\n\n            let offset_f = parseInt(apsStr(buf, 49, 3), 10);\n            msg.data.ecu.firmware = apsStr(buf, 52, offset_f);\n        }\n\n        // prepare Inverter query\n        if (msg.data.ecu.inverters_number > 0) {\n            msg.payload = \"APS1100280002\" + msg.data.ecu.id + \"END\\n\";\n        \n            node.send([msg, null]);\n        } else {\n            node.send([null, msg]);\n        }\n    }\n\n    return\n}\nelse {\n\n    // Parse Inverter data\n    let buf = Buffer.from(msg.payload);\n    msg.data.inverters = {}\n\n    if (apsStr(buf, 9, 4) === \"0002\") {\n        let offset1 = 0;\n        let offset2 = 26;\n\n        if (apsStr(buf, 14, 2) == \"00\") {\n            while (offset1 < apsInt(buf, 17)) {\n                if (apsStr(buf, 15, 2) == \"01\") {\n                    msg.data.inverters[offset1] = {\n                        'id': apsUid(buf, offset2),\n                        'type': Number(apsStr(buf, offset2 + 7, 2)),\n                        'online': apsShort(buf, offset2 + 6),\n                        'temperature': 0\n                    };\n\n                    // common\n                    if (msg.data.inverters[offset1]['type'] in [1, 2, 3, 4, 5]) {\n                        msg.data.inverters[offset1]['frequency'] = apsInt(buf, offset2 + 9) / 10;\n\n                        if (msg.data.inverters[offset1]['online'] === 1) {\n                            msg.data.inverters[offset1]['temperature'] = apsInt(buf, offset2 + 11) - 100;\n                        }\n                    }\n\n                    if (msg.data.inverters[offset1]['type'] in [1, 4, 5]) {\n\n                        offset2 = offset2 + 21;\n                    }\n                    else if (msg.data.inverters[offset1]['type'] === 2) {\n\n                        offset2 = offset2 + 27;\n                    }\n                    else if (msg.data.inverters[offset1]['type'] === 3) {\n\n                        offset2 = offset2 + 23;\n                    }\n                    else {\n                        offset2 = offset2 + 9;\n                    }\n                }\n\n                offset1++;\n            }\n        }\n    }\n    node.send([null, msg]);\n\n    return;\n}\n",
+        "func": "function apsError(start) {\n    node.status('Error start at: ' + start);\n    throw new Error(`Données insuffisantes à la position ${start}`);\n}\n\nfunction apsStr(buffer, start, amount) {\n    if ((start + amount) > buffer.length) apsError(start);\n\n    return buffer.subarray(start, start + amount).toString('utf8');\n}\n\nfunction apsUid(buffer, start) {\n    if ((start + 12) > buffer.length) apsError(start);\n\n    return buffer.subarray(start, start + 12).toString('hex').slice(0, 12);\n}\n\nfunction apsInt(buffer, start) {\n    if ((start + 2) > buffer.length) apsError(start);\n\n    return buffer.readUInt16BE(start);\n}\n\nfunction apsDouble(buffer, start) {\n    if ((start + 4) > buffer.length) apsError(start);\n\n    return buffer.readUInt32BE(start);\n}\n\nfunction apsShort(buffer, start) {\n    try {\n        return parseInt(buffer.subarray(start, start + 1).toString('hex'), 8);\n    } catch (err) {\n        apsError(start);\n    }\n}\n\nif (typeof msg.data !== 'object') {\n    // Grab known ECU IP\n    let units = global.get('units', 'default');\n    if (typeof units === 'object') {\n        for (const name in units) {\n            node.send([{\n                'topic': name,\n                'host': units[name]['ip'],\n                'port': '8899',\n                'payload': \"APS1100160001\" + \"END\\n\",\n                'data': {}\n            }, null]);\n        }\n    }\n\n    return;\n}\n\nif (typeof msg.data.ecu !== 'object') {\n\n    // Parse ECU data\n    let buf = Buffer.from(msg.payload);\n    node.status({ text: 'buffer length: ' + buf.length});\n\n    msg.data = {\n        'ecu': {\n            'id': '',\n            'name': msg.topic,\n            'host': msg.host,\n            'port': msg.port,\n            'type': 0,\n            'energy_total': 0,\n            'energy_today': 0,\n            'power_instant': 0,\n            'inverters_number': 0,\n            'inverters_online': 0\n        }\n    }\n\n    if (apsStr(buf, 9, 4) === \"0001\") {\n        msg.data.ecu.id = apsStr(buf, 13, 12);\n        msg.data.ecu.type = parseInt(apsStr(buf, 25, 2), 10); // 1 or 2\n        msg.data.ecu.energy_total = apsDouble(buf, 27) / 10;\n        msg.data.ecu.power_instant = apsDouble(buf, 31)\n        msg.data.ecu.energy_today = apsDouble(buf, 35) / 100;\n\n        if (msg.data.ecu.type === 1) {\n            msg.data.ecu.inverters_number = apsInt(buf, 46);\n            msg.data.ecu.inverters_online = apsInt(buf, 48);\n\n            let offset_f = parseInt(apsStr(buf, 52, 3), 10);\n            msg.data.ecu.firmware = apsStr(buf, 55, offset_f);\n            let offset_t = parseInt(apsStr(buf, 55 + offset_f, 3), 10);\n            msg.data.ecu.timezone = apsStr(buf, 58 + offset_f, offset_t);\n\n        }\n        else if (msg.data.ecu.type === 2) {\n            msg.data.ecu.inverters_number = apsInt(buf, 39);\n            msg.data.ecu.inverters_online = apsInt(buf, 41);\n\n            let offset_f = parseInt(apsStr(buf, 49, 3), 10);\n            msg.data.ecu.firmware = apsStr(buf, 52, offset_f);\n        }\n\n        // prepare Inverter query\n        if (msg.data.ecu.inverters_number > 0) {\n            msg.payload = \"APS1100280002\" + msg.data.ecu.id + \"END\\n\";\n        \n            node.send([msg, null]);\n        } else {\n            node.send([null, msg]);\n        }\n    }\n\n    return\n}\nelse {\n\n    // Parse Inverter data\n    let buf = Buffer.from(msg.payload);\n    node.status({ text: 'buffer length: ' + buf.length});\n\n    msg.data.inverters = {}\n\n    if (apsStr(buf, 9, 4) === \"0002\") {\n        let offset1 = 0;\n        let offset2 = 26;\n\n        if (apsStr(buf, 14, 2) == \"00\") {\n            while (offset1 < apsInt(buf, 17)) {\n                if (apsStr(buf, 15, 2) == \"01\") {\n\n                    msg.data.inverters[offset1] = {\n                        'id': apsUid(buf, offset2),\n                        'type': Number(apsStr(buf, offset2 + 7, 2)),\n                        'online': apsShort(buf, offset2 + 6),\n                        'temperature': 0,\n                        'power': [],\n                        'voltage': []\n                    };\n\n                    // common\n                    if (msg.data.inverters[offset1]['type'] in [1, 2, 3, 4, 5]) {\n                        msg.data.inverters[offset1]['frequency'] = apsInt(buf, offset2 + 9) / 10;\n\n                        if (msg.data.inverters[offset1]['online'] === 1) {\n                            msg.data.inverters[offset1]['temperature'] = apsInt(buf, offset2 + 11) - 100;\n                        }\n                        msg.data.inverters[offset1]['power'][0] = apsInt(buf, offset2 + 13);\n                        msg.data.inverters[offset1]['voltage'][0] = apsInt(buf, offset2 + 15);\n                    }\n\n                    if (msg.data.inverters[offset1]['type'] in [1, 4, 5]) {\n\n                        msg.data.inverters[offset1]['model'] = 'YC600/DS3D/DS3-H/DS3/DS3-L';\n                        msg.data.inverters[offset1]['chanel'] = 2;\n                        msg.data.inverters[offset1]['power'][1] = apsInt(buf, offset2 + 17);\n                        msg.data.inverters[offset1]['voltage'][1] = apsInt(buf, offset2 + 19);\n\n                        offset2 = offset2 + 21;\n                    }\n                    else if (msg.data.inverters[offset1]['type'] === 2) {\n\n                        msg.data.inverters[offset1]['model'] = 'YC1000/QT2';\n                        msg.data.inverters[offset1]['chanel'] = 4;\n                        msg.data.inverters[offset1]['power'][1] = apsInt(buf, offset2 + 17);\n                        msg.data.inverters[offset1]['voltage'][1] = apsInt(buf, offset2 + 19);\n                        msg.data.inverters[offset1]['power'][2] = apsInt(buf, offset2 + 21);\n                        msg.data.inverters[offset1]['voltage'][2] = apsInt(buf, offset2 + 23);\n                        msg.data.inverters[offset1]['power'][3] = apsInt(buf, offset2 + 25);\n\n                        offset2 = offset2 + 27;\n                    }\n                    else if (msg.data.inverters[offset1]['type'] === 3) {\n\n                        msg.data.inverters[offset1]['model'] = 'QS1';\n                        msg.data.inverters[offset1]['chanel'] = 4;\n                        msg.data.inverters[offset1]['power'][1] = apsInt(buf, offset2 + 17);\n                        msg.data.inverters[offset1]['power'][2] = apsInt(buf, offset2 + 19);\n                        msg.data.inverters[offset1]['power'][3] = apsInt(buf, offset2 + 21);\n\n                        offset2 = offset2 + 23;\n                    }\n                    else {\n                        offset2 = offset2 + 9;\n                    }\n                }\n\n                offset1++;\n            }\n        }\n    }\n\n    // CLeanup\n    delete msg.host;\n    delete msg.port;\n    msg.topic = global.get('mqtt.topic', 'default') + '/' + msg.topic;\n    msg.payload = msg.data;\n\n    // Global\n    let controls = global.get('controls', 'default');\n    if (typeof controls !== 'object') {\n        controls = {}\n    }\n    controls[msg.payload.ecu.name] = msg.payload;\n    global.set('controls', controls, 'default');\n\n    node.send([null, msg]);\n\n    return;\n}\n",
         "outputs": 2,
         "timeout": 0,
         "noerr": 0,
         "initialize": "",
         "finalize": "",
         "libs": [],
-        "x": 370,
-        "y": 360,
+        "x": 210,
+        "y": 320,
         "wires": [
             [
                 "d82deb0a07d618ee"
             ],
             [
-                "cd522600a32e953e"
+                "cd522600a32e953e",
+                "0bf80703420c701e"
             ]
         ]
     },
@@ -1112,6 +1140,7 @@
         "id": "d82deb0a07d618ee",
         "type": "tcp request",
         "z": "4bc72a1112cb448c",
+        "g": "f880574ac1875493",
         "name": "ECU Queries",
         "server": "",
         "port": "",
@@ -1121,12 +1150,11 @@
         "newline": "",
         "trim": false,
         "tls": "",
-        "x": 370,
-        "y": 420,
+        "x": 210,
+        "y": 380,
         "wires": [
             [
-                "3538a60e6e05ade1",
-                "699796f0f73f6054"
+                "3538a60e6e05ade1"
             ]
         ]
     },
@@ -1135,26 +1163,23 @@
         "type": "comment",
         "z": "4bc72a1112cb448c",
         "name": "Source",
-        "info": "https://github.com/fligneul/aps2mqtt/blob/main/src/aps2mqtt/apsystems/APSystemsSocket.py#L153\n",
-        "x": 830,
-        "y": 340,
+        "info": "https://github.com/fligneul/aps2mqtt/blob/main/src/aps2mqtt/apsystems/APSystemsSocket.py\nhttps://github.com/HAEdwin/homeassistant-apsystems_ecu_reader/blob/main/custom_components/apsystems_ecu_reader/ecu_api.py\n",
+        "x": 810,
+        "y": 140,
         "wires": []
     },
     {
-        "id": "699796f0f73f6054",
-        "type": "debug",
+        "id": "0bf80703420c701e",
+        "type": "link out",
         "z": "4bc72a1112cb448c",
-        "name": "debug 1",
-        "active": true,
-        "tosidebar": true,
-        "console": false,
-        "tostatus": false,
-        "complete": "true",
-        "targetType": "full",
-        "statusVal": "",
-        "statusType": "auto",
-        "x": 560,
-        "y": 420,
+        "g": "f880574ac1875493",
+        "name": "kernel - control",
+        "mode": "link",
+        "links": [
+            "8704b93076a73d7e"
+        ],
+        "x": 355,
+        "y": 320,
         "wires": []
     }
 ]
