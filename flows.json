@@ -209,7 +209,6 @@
             "84750319a3a2463b",
             "9c745b2a8599abf3",
             "f7441e7b64e4cea3",
-            "bc41c235c2078a23",
             "7d8de98aa71ecc40",
             "8c1baae83dae667e",
             "31b7a11ce646deba",
@@ -1526,8 +1525,8 @@
                 "t": "set",
                 "p": "payload",
                 "pt": "msg",
-                "to": "topic",
-                "tot": "msg"
+                "to": "current_ecu",
+                "tot": "flow"
             }
         ],
         "action": "",
@@ -1548,10 +1547,10 @@
         "type": "delay",
         "z": "4bc72a1112cb448c",
         "g": "6b4c2dd3f5df77bd",
-        "name": "1s",
+        "name": "1m",
         "pauseType": "delay",
         "timeout": "1",
-        "timeoutUnits": "seconds",
+        "timeoutUnits": "minutes",
         "rate": "1",
         "nbRateUnits": "1",
         "rateUnits": "second",
@@ -1635,7 +1634,8 @@
             [
                 "3fe540fa0313af8e",
                 "775ce16511f819d8",
-                "9c745b2a8599abf3"
+                "9c745b2a8599abf3",
+                "be9df446e8994af5"
             ]
         ]
     },
@@ -1917,24 +1917,6 @@
         ]
     },
     {
-        "id": "bc41c235c2078a23",
-        "type": "debug",
-        "z": "4bc72a1112cb448c",
-        "g": "6b4c2dd3f5df77bd",
-        "name": "debug 1",
-        "active": true,
-        "tosidebar": true,
-        "console": false,
-        "tostatus": false,
-        "complete": "true",
-        "targetType": "full",
-        "statusVal": "",
-        "statusType": "auto",
-        "x": 2080,
-        "y": 1400,
-        "wires": []
-    },
-    {
         "id": "7d8de98aa71ecc40",
         "type": "function",
         "z": "4bc72a1112cb448c",
@@ -1976,7 +1958,6 @@
         "y": 1460,
         "wires": [
             [
-                "bc41c235c2078a23",
                 "0a26b25c7f5f0f97"
             ]
         ]
