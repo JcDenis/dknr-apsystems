@@ -213,11 +213,13 @@
             "7d8de98aa71ecc40",
             "8c1baae83dae667e",
             "31b7a11ce646deba",
-            "0a26b25c7f5f0f97"
+            "0a26b25c7f5f0f97",
+            "9f279216041658c7",
+            "da492ba229cc3b36"
         ],
         "x": 84,
         "y": 1299,
-        "w": 2222,
+        "w": 2242,
         "h": 442
     },
     {
@@ -407,7 +409,7 @@
         "group": "8d032322dc675ac9",
         "name": "spacer",
         "tooltip": "",
-        "order": 9,
+        "order": 10,
         "width": "6",
         "height": 1,
         "className": ""
@@ -1310,7 +1312,7 @@
         "z": "4bc72a1112cb448c",
         "g": "6b4c2dd3f5df77bd",
         "name": "get names",
-        "func": "flow.set('current_ecu', '', 'default');\n\nmsg.payload = '';\nmsg.class = '';\nmsg.enabled = true;\nmsg.options = [{\n    'label':'',\n    'value':'',\n    'dropdown':'name'\n}];\n\nlet i = 1;\nlet units = global.get('units', 'default');\nif (typeof units === 'object') {\n    for(const name in units) {\n        msg.options[i++] = {\n            'label':name,\n            'value':name,\n            'dropdown':'name'\n        }\n    }\n}\n\nreturn msg;",
+        "func": "flow.set('current_ecu', '', 'default');\nflow.set('current_inveter', '', 'default');\n\nmsg.payload = '';\nmsg.class = '';\nmsg.enabled = true;\nmsg.options = [{\n    'label':'',\n    'value':'',\n    'dropdown':'name'\n}];\n\nlet i = 1;\nlet units = global.get('units', 'default');\nif (typeof units === 'object') {\n    for(const name in units) {\n        msg.options[i++] = {\n            'label':name,\n            'value':name,\n            'dropdown':'name'\n        }\n    }\n}\n\nreturn msg;",
         "outputs": 1,
         "timeout": 0,
         "noerr": 0,
@@ -1609,6 +1611,13 @@
             },
             {
                 "t": "set",
+                "p": "current_inverter",
+                "pt": "flow",
+                "to": "",
+                "tot": "str"
+            },
+            {
+                "t": "set",
                 "p": "payload",
                 "pt": "msg",
                 "to": "controls[msg.payload]",
@@ -1638,7 +1647,7 @@
         "group": "8d032322dc675ac9",
         "name": "ui - control - delete",
         "label": "Supprimer",
-        "order": 10,
+        "order": 11,
         "width": "3",
         "height": "1",
         "emulateClick": false,
@@ -1922,7 +1931,7 @@
         "statusVal": "",
         "statusType": "auto",
         "x": 2080,
-        "y": 1460,
+        "y": 1400,
         "wires": []
     },
     {
@@ -1942,7 +1951,8 @@
         "y": 1520,
         "wires": [
             [
-                "8c1baae83dae667e"
+                "8c1baae83dae667e",
+                "9f279216041658c7"
             ],
             [
                 "31b7a11ce646deba"
@@ -1963,7 +1973,7 @@
         "finalize": "",
         "libs": [],
         "x": 1890,
-        "y": 1520,
+        "y": 1460,
         "wires": [
             [
                 "bc41c235c2078a23",
@@ -2053,6 +2063,72 @@
         "action": "replace",
         "className": "",
         "x": 2150,
+        "y": 1460,
+        "wires": [
+            []
+        ]
+    },
+    {
+        "id": "9f279216041658c7",
+        "type": "function",
+        "z": "4bc72a1112cb448c",
+        "g": "6b4c2dd3f5df77bd",
+        "name": "panel info",
+        "func": "let res = [];\nlet i = 0;\nlet exists = false;\n\n\nif (typeof msg.payload.frequency == 'number') {\n    res[i++] = {\n        'lbl': 'Fréquence',\n        'val': msg.payload.frequency + ' Hz',\n    }\n    exists = true;\n}\n\nif (typeof msg.payload.power == 'object') {\n    let powers = 0;\n    let power = '';\n    for (const k in msg.payload.power) {\n        powers = powers + msg.payload.power[k];\n        power = power + msg.payload.power[k] + ' W, '\n    }\n    res[i++] = {\n        'lbl': 'Puissance total',\n        'val': powers + ' W'\n    };\n    res[i++] = {\n        'lbl': 'Puissance par panneau',\n        'val': power\n    };\n    exists = true;\n}\n\nif (typeof msg.payload.voltage == 'object') {\n    let voltage = '';\n    for (const k in msg.payload.voltage) {\n        voltage = voltage + msg.payload.voltage[k] + ' V, ';\n    }\n    res[i++] = {\n        'lbl': 'Voltage par panneau',\n        'val': voltage\n    };\n    exists = true;\n}\n\nif (exists === true) {\n    msg.payload = res;\n    msg.class = '';\n\n    return msg;\n}\n\nreturn;",
+        "outputs": 1,
+        "timeout": 0,
+        "noerr": 0,
+        "initialize": "",
+        "finalize": "",
+        "libs": [],
+        "x": 1900,
+        "y": 1520,
+        "wires": [
+            [
+                "da492ba229cc3b36"
+            ]
+        ]
+    },
+    {
+        "id": "da492ba229cc3b36",
+        "type": "ui-table",
+        "z": "4bc72a1112cb448c",
+        "g": "6b4c2dd3f5df77bd",
+        "group": "8d032322dc675ac9",
+        "name": "ui - control - inverter energy table",
+        "label": "Production",
+        "order": 9,
+        "width": "3",
+        "height": "1",
+        "maxrows": 0,
+        "passthru": false,
+        "autocols": false,
+        "showSearch": false,
+        "deselect": true,
+        "selectionType": "click",
+        "columns": [
+            {
+                "title": "",
+                "key": "lbl",
+                "keyType": "key",
+                "type": "text",
+                "width": "40%",
+                "align": "end"
+            },
+            {
+                "title": "",
+                "key": "val",
+                "keyType": "key",
+                "type": "text",
+                "width": "",
+                "align": "start"
+            }
+        ],
+        "mobileBreakpoint": "sm",
+        "mobileBreakpointType": "defaults",
+        "action": "replace",
+        "className": "",
+        "x": 2160,
         "y": 1520,
         "wires": [
             []
