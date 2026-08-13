@@ -1,6 +1,6 @@
 # README
 
-[![Release](https://img.shields.io/docker/v/jcpd/dknr-apsystems)](https://img.shields.io/docker/v/jcpd/dknr-apsystems)
+[![Release](https://img.shields.io/docker/v/jcpd/dknr-apsystems?sort=semver)](https://img.shields.io/docker/v/jcpd/dknr-apsystems?sort=semver)
 [![Pull](https://img.shields.io/docker/pulls/jcpd/dknr-apsystems)](https://img.shields.io/docker/pulls/jcpd/dknr-apsystems)
 [![Issue](https://img.shields.io/github/issues/jcdenis/dknr-apsystems)](https://img.shields.io/github/issues/jcdenis/dknr-apsystems)
 [![License](https://img.shields.io/github/license/jcdenis/dknr-apsystems)](https://github.com/JcDenis/dknr-apsystems/blob/master/LICENSE)
