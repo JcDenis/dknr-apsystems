@@ -1311,16 +1311,19 @@
         "z": "4bc72a1112cb448c",
         "g": "6b4c2dd3f5df77bd",
         "name": "get names",
-        "func": "flow.set('current_ecu', '', 'default');\nflow.set('current_inveter', '', 'default');\n\nmsg.payload = '';\nmsg.class = '';\nmsg.enabled = true;\nmsg.options = [{\n    'label':'',\n    'value':'',\n    'dropdown':'name'\n}];\n\nlet i = 1;\nlet units = global.get('units', 'default');\nif (typeof units === 'object') {\n    for(const name in units) {\n        msg.options[i++] = {\n            'label':name,\n            'value':name,\n            'dropdown':'name'\n        }\n    }\n}\n\nreturn msg;",
-        "outputs": 1,
+        "func": "flow.set('current_ecu', '', 'default');\nflow.set('current_inveter', '', 'default');\n\nmsg.payload = '';\nmsg.class = '';\nmsg.enabled = true;\nmsg.options = [{\n    'label':'',\n    'value':'',\n    'dropdown':'name'\n}];\n\nlet i = 1;\nlet units = global.get('units', 'default');\nif (typeof units === 'object') {\n    for(const name in units) {\n        msg.options[i++] = {\n            'label':name,\n            'value':name,\n            'dropdown':'name'\n        }\n    }\n}\n\nif (i == 1) {\n    node.send([null, null]);\n}\nelse if (i == 2) {\n    msg.payload = msg.options[1]['value'];\n    node.send([msg, null]);\n    msg.class = 'remove';\n    msg.enlabed = false;\n    node.send([null, msg]);\n}\nelse {\n    node.send([null, msg]);\n}\n\nreturn;",
+        "outputs": 2,
         "timeout": 0,
         "noerr": 0,
         "initialize": "",
         "finalize": "",
         "libs": [],
         "x": 290,
-        "y": 1640,
+        "y": 1580,
         "wires": [
+            [
+                "2cd010eee2da8e29"
+            ],
             [
                 "da2b76d325ab019b"
             ]
@@ -1464,7 +1467,8 @@
         "y": 1580,
         "wires": [
             [
-                "263e38e78c31cbec"
+                "263e38e78c31cbec",
+                "31b7a11ce646deba"
             ]
         ]
     },
@@ -1922,7 +1926,7 @@
         "z": "4bc72a1112cb448c",
         "g": "6b4c2dd3f5df77bd",
         "name": "inverter",
-        "func": "let control = flow.get('current_ecu');\nlet inverters = global.get('controls[\"' + control + '\"][\"inverters\"]', 'default');\nif (typeof inverters === 'object' ) {\n    for(const k in inverters) {\n        if (inverters[k].id === msg.payload) {\n            msg.payload = inverters[k];\n\n            node.send([msg, null]);\n        }\n    }\n}\n\nnode.send(null, msg);\n\nreturn;",
+        "func": "if (msg.payload != '') {\n    let control = flow.get('current_ecu');\n    let inverters = global.get('controls[\"' + control + '\"][\"inverters\"]', 'default');\n    if (typeof inverters === 'object' ) {\n        for(const k in inverters) {\n            if (inverters[k].id === msg.payload) {\n                msg.payload = inverters[k];\n\n                node.send([msg, null]);\n\n                return;\n            }\n        }\n    }\n}\n\nnode.send([null, msg]);\n\nreturn;",
         "outputs": 2,
         "timeout": 0,
         "noerr": 0,
@@ -2000,7 +2004,8 @@
         "y": 1700,
         "wires": [
             [
-                "0a26b25c7f5f0f97"
+                "0a26b25c7f5f0f97",
+                "da492ba229cc3b36"
             ]
         ]
     },
