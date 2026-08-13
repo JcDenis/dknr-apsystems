@@ -46,10 +46,10 @@ jobs:
           echo "$SUMMARY" >> $GITHUB_STEP_SUMMARY
 
       - name: Create tag
-        uses: laputansoft/github-tag-action@v4.6
+        uses: mathieudutour/github-tag-action@v6.2
         with:
           github_token: ${{ secrets.GITHUB_TOKEN }}
-          tag: ${{ github.event.inputs.version }}
+          custom_tag: ${{ github.event.inputs.version }}
 
       - name: Check out the repo
         uses: actions/checkout@v7
