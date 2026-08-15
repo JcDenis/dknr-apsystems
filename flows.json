@@ -177,7 +177,7 @@
         "id": "80eb56db05239272",
         "type": "group",
         "z": "3300684acfa472e7",
-        "name": "ui - add",
+        "name": "custom - add",
         "style": {
             "fill": "#6f2fa0",
             "fill-opacity": "0.05",
@@ -201,7 +201,7 @@
         "id": "f880574ac1875493",
         "type": "group",
         "z": "3300684acfa472e7",
-        "name": "kernel - control",
+        "name": "custom - port",
         "style": {
             "fill": "#ff0000",
             "fill-opacity": "0.05",
@@ -216,14 +216,14 @@
         ],
         "x": 94,
         "y": 279,
-        "w": 452,
+        "w": 432,
         "h": 202
     },
     {
         "id": "6b4c2dd3f5df77bd",
         "type": "group",
         "z": "3300684acfa472e7",
-        "name": "ui - control",
+        "name": "custom - detail",
         "style": {
             "fill": "#6f2fa0",
             "fill-opacity": "0.05",
@@ -260,7 +260,7 @@
         ],
         "x": 84,
         "y": 699,
-        "w": 2242,
+        "w": 2282,
         "h": 442
     },
     {
@@ -1486,7 +1486,7 @@
         "type": "ui-form",
         "z": "3300684acfa472e7",
         "g": "80eb56db05239272",
-        "name": "ui - add - form",
+        "name": "custom - add - form",
         "group": "c8d7c7ef32d2e43c",
         "label": "",
         "order": 1,
@@ -1562,7 +1562,7 @@
                 "label": "ECU-C"
             }
         ],
-        "x": 440,
+        "x": 450,
         "y": 560,
         "wires": [
             [
@@ -1575,7 +1575,7 @@
         "type": "link out",
         "z": "3300684acfa472e7",
         "g": "80eb56db05239272",
-        "name": "ui - add",
+        "name": "custom - add",
         "mode": "link",
         "links": [
             "b9e756ce9dd6756f"
@@ -1660,11 +1660,11 @@
         "type": "link out",
         "z": "3300684acfa472e7",
         "g": "80eb56db05239272",
-        "name": "ui - add - error",
+        "name": "custom - add - error",
         "mode": "link",
         "links": [
-            "f4a2353e5f92576c",
-            "b9e756ce9dd6756f"
+            "b9e756ce9dd6756f",
+            "f4a2353e5f92576c"
         ],
         "x": 755,
         "y": 620,
@@ -1710,7 +1710,7 @@
         "type": "debug",
         "z": "3300684acfa472e7",
         "g": "f880574ac1875493",
-        "name": "kernel - control",
+        "name": "custom - port",
         "active": false,
         "tosidebar": true,
         "console": false,
@@ -1719,7 +1719,7 @@
         "targetType": "full",
         "statusVal": "",
         "statusType": "auto",
-        "x": 420,
+        "x": 410,
         "y": 440,
         "wires": []
     },
@@ -1775,7 +1775,7 @@
         "type": "link out",
         "z": "3300684acfa472e7",
         "g": "f880574ac1875493",
-        "name": "kernel - control",
+        "name": "custom - port",
         "mode": "link",
         "links": [
             "8704b93076a73d7e"
@@ -1802,7 +1802,7 @@
         "drop": false,
         "allowrate": false,
         "outputs": 1,
-        "x": 1790,
+        "x": 1810,
         "y": 740,
         "wires": [
             [
@@ -1815,7 +1815,7 @@
         "type": "link in",
         "z": "3300684acfa472e7",
         "g": "6b4c2dd3f5df77bd",
-        "name": "ui - control",
+        "name": "custom - detail",
         "links": [
             "92c098c716e46e3b",
             "f2ba5712ec8cd4b1"
@@ -2173,7 +2173,7 @@
         "z": "3300684acfa472e7",
         "g": "6b4c2dd3f5df77bd",
         "group": "8d032322dc675ac9",
-        "name": "ui - control - delete",
+        "name": "custom - detail - delete",
         "label": "Supprimer",
         "order": 11,
         "width": "3",
@@ -2199,7 +2199,7 @@
         "enablePointerup": false,
         "pointerupPayload": "",
         "pointerupPayloadType": "str",
-        "x": 1430,
+        "x": 1440,
         "y": 740,
         "wires": [
             [
@@ -2232,7 +2232,7 @@
         "from": "",
         "to": "",
         "reg": false,
-        "x": 1630,
+        "x": 1650,
         "y": 740,
         "wires": [
             [
@@ -2245,12 +2245,12 @@
         "type": "link out",
         "z": "3300684acfa472e7",
         "g": "6b4c2dd3f5df77bd",
-        "name": "ui - hvac - delete",
+        "name": "custom - detail - delete",
         "mode": "link",
         "links": [
             "550fd37cdd043e4d"
         ],
-        "x": 1915,
+        "x": 1935,
         "y": 740,
         "wires": []
     },
@@ -2281,7 +2281,7 @@
         "z": "3300684acfa472e7",
         "g": "6b4c2dd3f5df77bd",
         "group": "8d032322dc675ac9",
-        "name": "ui - control - ecu info table",
+        "name": "custom - detail - ecu info table",
         "label": "ECU",
         "order": 3,
         "width": "3",
@@ -2314,7 +2314,7 @@
         "mobileBreakpointType": "defaults",
         "action": "replace",
         "className": "",
-        "x": 1450,
+        "x": 1470,
         "y": 800,
         "wires": [
             []
@@ -2347,7 +2347,7 @@
         "z": "3300684acfa472e7",
         "g": "6b4c2dd3f5df77bd",
         "group": "8d032322dc675ac9",
-        "name": "ui - control - ecu energy table",
+        "name": "custom - detail - ecu energy table",
         "label": "Production",
         "order": 4,
         "width": "3",
@@ -2380,7 +2380,7 @@
         "mobileBreakpointType": "defaults",
         "action": "replace",
         "className": "",
-        "x": 1460,
+        "x": 1480,
         "y": 860,
         "wires": [
             []
@@ -2413,7 +2413,7 @@
         "z": "3300684acfa472e7",
         "g": "6b4c2dd3f5df77bd",
         "group": "8d032322dc675ac9",
-        "name": "ui - control - inverter select",
+        "name": "custom - detail - inverter select",
         "label": "Sélectionner un micro-onduleur",
         "tooltip": "",
         "order": 6,
@@ -2436,7 +2436,7 @@
         "className": "",
         "typeIsComboBox": false,
         "msgTrigger": "onChange",
-        "x": 1460,
+        "x": 1470,
         "y": 920,
         "wires": [
             [
@@ -2457,7 +2457,7 @@
         "initialize": "",
         "finalize": "",
         "libs": [],
-        "x": 1700,
+        "x": 1720,
         "y": 920,
         "wires": [
             [
@@ -2482,7 +2482,7 @@
         "initialize": "",
         "finalize": "",
         "libs": [],
-        "x": 1890,
+        "x": 1910,
         "y": 860,
         "wires": [
             [
@@ -2524,7 +2524,7 @@
         "from": "",
         "to": "",
         "reg": false,
-        "x": 1910,
+        "x": 1930,
         "y": 1100,
         "wires": [
             [
@@ -2539,7 +2539,7 @@
         "z": "3300684acfa472e7",
         "g": "6b4c2dd3f5df77bd",
         "group": "8d032322dc675ac9",
-        "name": "ui - control - inverter info table",
+        "name": "custom - detail - inverter info table",
         "label": "Mirco-onduleur",
         "order": 8,
         "width": "3",
@@ -2572,7 +2572,7 @@
         "mobileBreakpointType": "defaults",
         "action": "replace",
         "className": "",
-        "x": 2150,
+        "x": 2180,
         "y": 860,
         "wires": [
             []
@@ -2591,7 +2591,7 @@
         "initialize": "",
         "finalize": "",
         "libs": [],
-        "x": 1900,
+        "x": 1920,
         "y": 920,
         "wires": [
             [
@@ -2605,7 +2605,7 @@
         "z": "3300684acfa472e7",
         "g": "6b4c2dd3f5df77bd",
         "group": "8d032322dc675ac9",
-        "name": "ui - control - inverter energy table",
+        "name": "custom - detail - inverter energy table",
         "label": "Production",
         "order": 9,
         "width": "3",
@@ -2638,7 +2638,7 @@
         "mobileBreakpointType": "defaults",
         "action": "replace",
         "className": "",
-        "x": 2160,
+        "x": 2190,
         "y": 920,
         "wires": [
             []
