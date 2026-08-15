@@ -1,7 +1,7 @@
 {
     "name": "dknr-apsystems",
     "description": "DKNR APSystems",
-    "version": "0.0.1",
+    "version": "0.3",
     "dependencies": {
         "@flowfuse/node-red-dashboard": "1.30.2",
         "node-red-contrib-cron-plus": "2.2.4"
