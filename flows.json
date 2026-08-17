@@ -69,12 +69,12 @@
             "label": true
         },
         "nodes": [
-            "84741ff9d386b4bb",
             "6483959a5e73553e",
             "490f552ee626deb7",
             "d9dbb31a0ba1e2a5",
             "df19be1275e79b1c",
-            "f2cd63b49ac325ec"
+            "f2cd63b49ac325ec",
+            "a61e338a90e40454"
         ],
         "x": 84,
         "y": 939,
@@ -304,6 +304,29 @@
         "y": 159,
         "w": 392,
         "h": 82
+    },
+    {
+        "id": "c2a4c908aa1cf2e9",
+        "type": "group",
+        "z": "3300684acfa472e7",
+        "name": "custom - discovery",
+        "style": {
+            "fill": "#ff0000",
+            "fill-opacity": "0.05",
+            "label": true
+        },
+        "nodes": [
+            "b66aceda104390c6",
+            "e10ce118e77873bd",
+            "0ee0b69136e9646f",
+            "6bbab610c03dcbda",
+            "6326830faa9d7246",
+            "ace85f776ce24777"
+        ],
+        "x": 624,
+        "y": 279,
+        "w": 522,
+        "h": 142
     },
     {
         "id": "df7710b4b2c4e55b",
@@ -628,7 +651,8 @@
         "g": "9e3dbf7ae870765f",
         "name": "common - mqtt - send",
         "links": [
-            "0bf80703420c701e"
+            "0bf80703420c701e",
+            "6326830faa9d7246"
         ],
         "x": 125,
         "y": 500,
@@ -703,34 +727,6 @@
         "x": 1235,
         "y": 80,
         "wires": []
-    },
-    {
-        "id": "84741ff9d386b4bb",
-        "type": "change",
-        "z": "4bc72a1112cb448c",
-        "g": "d15289b1932a175e",
-        "name": "read",
-        "rules": [
-            {
-                "t": "set",
-                "p": "payload",
-                "pt": "msg",
-                "to": "mqtt",
-                "tot": "global"
-            }
-        ],
-        "action": "",
-        "property": "",
-        "from": "",
-        "to": "",
-        "reg": false,
-        "x": 250,
-        "y": 980,
-        "wires": [
-            [
-                "d9dbb31a0ba1e2a5"
-            ]
-        ]
     },
     {
         "id": "6483959a5e73553e",
@@ -859,6 +855,13 @@
                 "rows": null
             },
             {
+                "label": "Home Assistant Discovery topic",
+                "key": "discovery",
+                "type": "text",
+                "required": false,
+                "rows": null
+            },
+            {
                 "label": "Activation",
                 "key": "enabled",
                 "type": "checkbox",
@@ -872,6 +875,7 @@
             "topic": "",
             "username": "",
             "password": "",
+            "discovery": "",
             "enabled": false
         },
         "payload": "",
@@ -897,17 +901,17 @@
         "type": "link in",
         "z": "4bc72a1112cb448c",
         "g": "d15289b1932a175e",
-        "name": "ui - mqtt - settings",
+        "name": "common - mqtt - form",
         "links": [
+            "911bbe32f79bec46",
             "92c098c716e46e3b",
-            "f2cd63b49ac325ec",
-            "911bbe32f79bec46"
+            "f2cd63b49ac325ec"
         ],
         "x": 125,
         "y": 980,
         "wires": [
             [
-                "84741ff9d386b4bb"
+                "a61e338a90e40454"
             ]
         ]
     },
@@ -916,11 +920,12 @@
         "type": "link out",
         "z": "4bc72a1112cb448c",
         "g": "d15289b1932a175e",
-        "name": "ui - mqtt - settings",
+        "name": "common - mqtt - form",
         "mode": "link",
         "links": [
             "3fa36de74a10eac1",
-            "df19be1275e79b1c"
+            "df19be1275e79b1c",
+            "b66aceda104390c6"
         ],
         "x": 915,
         "y": 980,
@@ -1463,6 +1468,27 @@
         "wires": []
     },
     {
+        "id": "a61e338a90e40454",
+        "type": "function",
+        "z": "4bc72a1112cb448c",
+        "g": "d15289b1932a175e",
+        "name": "read",
+        "func": "msg.payload = global.get('mqtt', 'default') || {}\n\nif (typeof msg.payload.discovery !== 'string' || msg.payload.discorevy == '') {\n    msg.payload.discovery = 'homeassistant';\n}\n\nreturn msg;",
+        "outputs": 1,
+        "timeout": 0,
+        "noerr": 0,
+        "initialize": "",
+        "finalize": "",
+        "libs": [],
+        "x": 250,
+        "y": 980,
+        "wires": [
+            [
+                "d9dbb31a0ba1e2a5"
+            ]
+        ]
+    },
+    {
         "id": "b9e756ce9dd6756f",
         "type": "link in",
         "z": "3300684acfa472e7",
@@ -1730,7 +1756,7 @@
         "z": "3300684acfa472e7",
         "g": "f880574ac1875493",
         "name": "parse buffer",
-        "func": "function apsError(start) {\n    node.status('Error start at: ' + start);\n    throw new Error(`Données insuffisantes à la position ${start}`);\n}\n\nfunction apsStr(buffer, start, amount) {\n    if ((start + amount) > buffer.length) apsError(start);\n\n    return buffer.subarray(start, start + amount).toString('utf8');\n}\n\nfunction apsUid(buffer, start) {\n    if ((start + 12) > buffer.length) apsError(start);\n\n    return buffer.subarray(start, start + 12).toString('hex').slice(0, 12);\n}\n\nfunction apsInt(buffer, start) {\n    if ((start + 2) > buffer.length) apsError(start);\n\n    return buffer.readUInt16BE(start);\n}\n\nfunction apsDouble(buffer, start) {\n    if ((start + 4) > buffer.length) apsError(start);\n\n    return buffer.readUInt32BE(start);\n}\n\nfunction apsShort(buffer, start) {\n    try {\n        return parseInt(buffer.subarray(start, start + 1).toString('hex'), 8);\n    } catch (err) {\n        apsError(start);\n    }\n}\n\nif (typeof msg.data !== 'object') {\n    // Grab known ECU IP\n    let units = global.get('units', 'default');\n    if (typeof units === 'object') {\n        for (const host in units) {\n            node.send([{\n                'topic': '',\n                'name': units[host]['name'],\n                'location': units[host]['location'],\n                'host': units[host]['host'],\n                'port': units[host]['port'],\n                'payload': \"APS1100160001\" + \"END\\n\",\n                'data': {}\n            }, null]);\n        }\n    }\n\n    return;\n}\n\nif (typeof msg.data.ecu !== 'object') {\n\n    // Parse ECU data\n    let buf = Buffer.from(msg.payload);\n    node.status({ text: 'buffer length: ' + buf.length});\n\n    msg.data = {\n        'ecu': {\n            'id': '',\n            'name': msg.name,\n            'location': msg.location,\n            'host': msg.host,\n            'port': msg.port,\n            'type': 0,\n            'energy_total': 0,\n            'energy_total_unit': 'kWh',\n            'energy_today': 0,\n            'energy_today_unit': 'kWh',\n            'power_instant': 0,\n            'power_instant_unit': 'W',\n            'inverters_quantity': 0,\n            'inverters_online': 0\n        }\n    }\n\n    if (apsStr(buf, 9, 4) === \"0001\") {\n        msg.data.ecu.id = apsStr(buf, 13, 12);\n        msg.data.ecu.type = parseInt(apsStr(buf, 25, 2), 10); // 1 or 2\n        msg.data.ecu.energy_total = apsDouble(buf, 27) / 10;\n        msg.data.ecu.power_instant = apsDouble(buf, 31)\n        msg.data.ecu.energy_today = apsDouble(buf, 35) / 100;\n\n        if (msg.data.ecu.type === 1) {\n            msg.data.ecu.inverters_quantity = apsInt(buf, 46);\n            msg.data.ecu.inverters_online = apsInt(buf, 48);\n\n            let offset_f = parseInt(apsStr(buf, 52, 3), 10);\n            msg.data.ecu.firmware = apsStr(buf, 55, offset_f);\n            let offset_t = parseInt(apsStr(buf, 55 + offset_f, 3), 10);\n            msg.data.ecu.timezone = apsStr(buf, 58 + offset_f, offset_t);\n\n        }\n        else if (msg.data.ecu.type === 2) {\n            msg.data.ecu.inverters_quantity = apsInt(buf, 39);\n            msg.data.ecu.inverters_online = apsInt(buf, 41);\n\n            let offset_f = parseInt(apsStr(buf, 49, 3), 10);\n            msg.data.ecu.firmware = apsStr(buf, 52, offset_f);\n        }\n\n        // Send ECU data\n        if (typeof global.get('mqtt.host', 'default') === 'string') {\n            let newMsg = {\n                'topic': global.get('mqtt.topic', 'default') + '/ecu/' + msg.data.ecu.id,\n                'payload': msg.data.ecu,\n            };\n            node.send([null, newMsg]);\n        }\n\n        // prepare Inverter query\n        if (msg.data.ecu.inverters_quantity > 0) {\n            msg.payload = \"APS1100280002\" + msg.data.ecu.id + \"END\\n\";\n        \n            node.send([msg, null]);\n        } else {\n            //node.send([null, msg]);\n        }\n    }\n\n    return\n}\nelse {\n\n    // Parse Inverter data\n    let buf = Buffer.from(msg.payload);\n    node.status({ text: 'buffer length: ' + buf.length});\n\n    msg.data.inverters = {}\n\n    if (apsStr(buf, 9, 4) === \"0002\") {\n        let offset1 = 0;\n        let offset2 = 26;\n\n        if (apsStr(buf, 14, 2) == \"00\") {\n            while (offset1 < apsInt(buf, 17)) {\n                if (apsStr(buf, 15, 2) == \"01\") {\n\n                    msg.data.inverters[offset1] = {\n                        'id': apsUid(buf, offset2),\n                        'ecu': msg.data.ecu.id,\n                        'name': msg.data.ecu.name + '_i' + (offset1 + 1),\n                        'location': msg.data.ecu.location,\n                        'type': Number(apsStr(buf, offset2 + 7, 2)),\n                        'online': apsShort(buf, offset2 + 6),\n                        'temperature': 0,\n                        'power': [],\n                        'voltage': []\n                    };\n\n                    // common\n                    if (msg.data.inverters[offset1]['type'] in [1, 2, 3, 4, 5]) {\n                        msg.data.inverters[offset1]['frequency'] = apsInt(buf, offset2 + 9) / 10;\n\n                        if (msg.data.inverters[offset1]['online'] === 1) {\n                            msg.data.inverters[offset1]['temperature'] = apsInt(buf, offset2 + 11) - 100;\n                        }\n                        msg.data.inverters[offset1]['power'][0] = apsInt(buf, offset2 + 13);\n                        msg.data.inverters[offset1]['voltage'][0] = apsInt(buf, offset2 + 15);\n                    }\n\n                    if (msg.data.inverters[offset1]['type'] in [1, 4, 5]) {\n\n                        msg.data.inverters[offset1]['model'] = 'YC600/DS3D/DS3-H/DS3/DS3-L';\n                        msg.data.inverters[offset1]['chanel'] = 2;\n                        msg.data.inverters[offset1]['max'] = 2000; // YC600=600VA,DS3D=2000VA,DS3-H=960VA, DS3=880VA, DS3-L=730VA\n                        msg.data.inverters[offset1]['power'][1] = apsInt(buf, offset2 + 17);\n                        msg.data.inverters[offset1]['voltage'][1] = apsInt(buf, offset2 + 19);\n\n                        offset2 = offset2 + 21;\n                    }\n                    else if (msg.data.inverters[offset1]['type'] === 2) {\n\n                        msg.data.inverters[offset1]['model'] = 'YC1000/QT2';\n                        msg.data.inverters[offset1]['chanel'] = 4;\n                        msg.data.inverters[offset1]['max'] = 2000; // YC1000=1000VA, QT2=2000VA\n                        msg.data.inverters[offset1]['power'][1] = apsInt(buf, offset2 + 17);\n                        msg.data.inverters[offset1]['voltage'][1] = apsInt(buf, offset2 + 19);\n                        msg.data.inverters[offset1]['power'][2] = apsInt(buf, offset2 + 21);\n                        msg.data.inverters[offset1]['voltage'][2] = apsInt(buf, offset2 + 23);\n                        msg.data.inverters[offset1]['power'][3] = apsInt(buf, offset2 + 25);\n\n                        offset2 = offset2 + 27;\n                    }\n                    else if (msg.data.inverters[offset1]['type'] === 3) {\n\n                        msg.data.inverters[offset1]['model'] = 'QS1';\n                        msg.data.inverters[offset1]['chanel'] = 4;\n                        msg.data.inverters[offset1]['max'] = 1200; // QS1=1200VA\n                        msg.data.inverters[offset1]['power'][1] = apsInt(buf, offset2 + 17);\n                        msg.data.inverters[offset1]['power'][2] = apsInt(buf, offset2 + 19);\n                        msg.data.inverters[offset1]['power'][3] = apsInt(buf, offset2 + 21);\n\n                        offset2 = offset2 + 23;\n                    }\n                    else {\n                        offset2 = offset2 + 9;\n                    }\n\n                    // Send ECU inverter data\n                    if (typeof global.get('mqtt.host', 'default') === 'string') {\n                        let newMsg = {\n                            'topic': global.get('mqtt.topic', 'default') + '/inverter/' + msg.data.inverters[offset1]['id'],\n                            'payload': msg.data.inverters[offset1],\n                        };\n                        node.send([null, newMsg]);\n                    }\n                }\n\n                offset1++;\n            }\n        }\n    }\n\n    // CLeanup\n    delete msg.name;\n    delete msg.location;\n    delete msg.host;\n    delete msg.port;\n    msg.topic = global.get('mqtt.topic', 'default') + '/' + msg.data.ecu.id;\n    msg.payload = msg.data;\n\n    // Global\n    let controls = global.get('controls', 'memoryOnly');\n    if (typeof controls !== 'object') {\n        controls = {}\n    }\n    controls[msg.payload.ecu.host] = msg.payload;\n    global.set('controls', controls, 'memoryOnly');\n\n    node.status({text: msg.payload.ecu.inverters_online + ' / ' + msg.payload.ecu.inverters_quantity});\n\n    return;\n}\n",
+        "func": "function apsError(start) {\n    node.status('Error start at: ' + start);\n    throw new Error(`Données insuffisantes à la position ${start}`);\n}\n\nfunction apsStr(buffer, start, amount) {\n    if ((start + amount) > buffer.length) apsError(start);\n\n    return buffer.subarray(start, start + amount).toString('utf8');\n}\n\nfunction apsUid(buffer, start) {\n    if ((start + 12) > buffer.length) apsError(start);\n\n    return buffer.subarray(start, start + 12).toString('hex').slice(0, 12);\n}\n\nfunction apsInt(buffer, start) {\n    if ((start + 2) > buffer.length) apsError(start);\n\n    return buffer.readUInt16BE(start);\n}\n\nfunction apsDouble(buffer, start) {\n    if ((start + 4) > buffer.length) apsError(start);\n\n    return buffer.readUInt32BE(start);\n}\n\nfunction apsShort(buffer, start) {\n    try {\n        return parseInt(buffer.subarray(start, start + 1).toString('hex'), 8);\n    } catch (err) {\n        apsError(start);\n    }\n}\n\nif (typeof msg.data !== 'object') {\n    // Grab known ECU IP\n    let units = global.get('units', 'default');\n    if (typeof units === 'object') {\n        for (const host in units) {\n            node.send([{\n                'topic': '',\n                'name': units[host]['name'],\n                'location': units[host]['location'],\n                'host': units[host]['host'],\n                'port': units[host]['port'],\n                'payload': \"APS1100160001\" + \"END\\n\",\n                'data': {}\n            }, null]);\n        }\n    }\n\n    return;\n}\n\nif (typeof msg.data.ecu !== 'object') {\n\n    // Parse ECU data\n    let buf = Buffer.from(msg.payload);\n    node.status({ text: 'buffer length: ' + buf.length});\n\n    msg.data = {\n        'ecu': {\n            'id': '',\n            'name': msg.name,\n            'location': msg.location,\n            'host': msg.host,\n            'port': msg.port,\n            'type': 0,\n            'energy_total': 0,\n            'energy_total_unit': 'kWh',\n            'energy_today': 0,\n            'energy_today_unit': 'kWh',\n            'power_instant': 0,\n            'power_instant_unit': 'W',\n            'inverters_quantity': 0,\n            'inverters_online': 0\n        }\n    }\n\n    if (apsStr(buf, 9, 4) === \"0001\") {\n        msg.data.ecu.id = apsStr(buf, 13, 12);\n        msg.data.ecu.type = parseInt(apsStr(buf, 25, 2), 10); // 1 or 2\n        msg.data.ecu.energy_total = apsDouble(buf, 27) / 10;\n        msg.data.ecu.power_instant = apsDouble(buf, 31)\n        msg.data.ecu.energy_today = apsDouble(buf, 35) / 100;\n\n        if (msg.data.ecu.type === 1) {\n            msg.data.ecu.inverters_quantity = apsInt(buf, 46);\n            msg.data.ecu.inverters_online = apsInt(buf, 48);\n\n            let offset_f = parseInt(apsStr(buf, 52, 3), 10);\n            msg.data.ecu.firmware = apsStr(buf, 55, offset_f);\n            let offset_t = parseInt(apsStr(buf, 55 + offset_f, 3), 10);\n            msg.data.ecu.timezone = apsStr(buf, 58 + offset_f, offset_t);\n\n        }\n        else if (msg.data.ecu.type === 2) {\n            msg.data.ecu.inverters_quantity = apsInt(buf, 39);\n            msg.data.ecu.inverters_online = apsInt(buf, 41);\n\n            let offset_f = parseInt(apsStr(buf, 49, 3), 10);\n            msg.data.ecu.firmware = apsStr(buf, 52, offset_f);\n        }\n\n        // Send ECU data\n        if (typeof global.get('mqtt.host', 'default') === 'string') {\n            let newMsg = {\n                'topic': global.get('mqtt.topic', 'default') + '/ecu/' + msg.data.ecu.id,\n                'payload': msg.data.ecu,\n            };\n            node.send([null, newMsg]);\n        }\n\n        // prepare Inverter query\n        if (msg.data.ecu.inverters_quantity > 0) {\n            msg.payload = \"APS1100280002\" + msg.data.ecu.id + \"END\\n\";\n        \n            node.send([msg, null]);\n        } else {\n            //node.send([null, msg]);\n        }\n    }\n\n    return\n}\nelse {\n\n    // Parse Inverter data\n    let buf = Buffer.from(msg.payload);\n    node.status({ text: 'buffer length: ' + buf.length});\n\n    msg.data.inverters = {}\n\n    if (apsStr(buf, 9, 4) === \"0002\") {\n        let offset1 = 0;\n        let offset2 = 26;\n\n        if (apsStr(buf, 14, 2) == \"00\") {\n            while (offset1 < apsInt(buf, 17)) {\n                if (apsStr(buf, 15, 2) == \"01\") {\n\n                    msg.data.inverters[offset1] = {\n                        'id': apsUid(buf, offset2),\n                        'ecu': msg.data.ecu.id,\n                        'name': msg.data.ecu.name + '_i' + (offset1 + 1),\n                        'location': msg.data.ecu.location,\n                        'type': Number(apsStr(buf, offset2 + 7, 2)),\n                        'online': apsShort(buf, offset2 + 6),\n                        'temperature': 0,\n                        'power': [],\n                        'voltage': [],\n                        'power_instant': 0,\n                        'voltage_mean': 0,\n                    };\n\n                    // common\n                    if (msg.data.inverters[offset1]['type'] in [1, 2, 3, 4, 5]) {\n                        msg.data.inverters[offset1]['frequency'] = apsInt(buf, offset2 + 9) / 10;\n\n                        if (msg.data.inverters[offset1]['online'] === 1) {\n                            msg.data.inverters[offset1]['temperature'] = apsInt(buf, offset2 + 11) - 100;\n                        }\n                        msg.data.inverters[offset1]['power'][0] = apsInt(buf, offset2 + 13);\n                        msg.data.inverters[offset1]['voltage'][0] = apsInt(buf, offset2 + 15);\n\n                        msg.data.inverters[offset1]['power_instant'] = msg.data.inverters[offset1]['power'][0];\n                        msg.data.inverters[offset1]['voltage_mean'] = msg.data.inverters[offset1]['voltage'][0];\n                    }\n\n                    if (msg.data.inverters[offset1]['type'] in [1, 4, 5]) {\n\n                        msg.data.inverters[offset1]['model'] = 'YC600/DS3D/DS3-H/DS3/DS3-L';\n                        msg.data.inverters[offset1]['chanel'] = 2;\n                        msg.data.inverters[offset1]['max'] = 2000; // YC600=600VA,DS3D=2000VA,DS3-H=960VA, DS3=880VA, DS3-L=730VA\n                        msg.data.inverters[offset1]['power'][1] = apsInt(buf, offset2 + 17);\n                        msg.data.inverters[offset1]['voltage'][1] = apsInt(buf, offset2 + 19);\n\n                        msg.data.inverters[offset1]['power_instant'] += msg.data.inverters[offset1]['power'][1];\n\n                        offset2 = offset2 + 21;\n                    }\n                    else if (msg.data.inverters[offset1]['type'] === 2) {\n\n                        msg.data.inverters[offset1]['model'] = 'YC1000/QT2';\n                        msg.data.inverters[offset1]['chanel'] = 4;\n                        msg.data.inverters[offset1]['max'] = 2000; // YC1000=1000VA, QT2=2000VA\n                        msg.data.inverters[offset1]['power'][1] = apsInt(buf, offset2 + 17);\n                        msg.data.inverters[offset1]['voltage'][1] = apsInt(buf, offset2 + 19);\n                        msg.data.inverters[offset1]['power'][2] = apsInt(buf, offset2 + 21);\n                        msg.data.inverters[offset1]['voltage'][2] = apsInt(buf, offset2 + 23);\n                        msg.data.inverters[offset1]['power'][3] = apsInt(buf, offset2 + 25);\n\n                        msg.data.inverters[offset1]['power_instant'] += msg.data.inverters[offset1]['power'][1];\n                        msg.data.inverters[offset1]['power_instant'] += msg.data.inverters[offset1]['power'][2];\n                        msg.data.inverters[offset1]['power_instant'] += msg.data.inverters[offset1]['power'][3];\n\n                        offset2 = offset2 + 27;\n                    }\n                    else if (msg.data.inverters[offset1]['type'] === 3) {\n\n                        msg.data.inverters[offset1]['model'] = 'QS1';\n                        msg.data.inverters[offset1]['chanel'] = 4;\n                        msg.data.inverters[offset1]['max'] = 1200; // QS1=1200VA\n                        msg.data.inverters[offset1]['power'][1] = apsInt(buf, offset2 + 17);\n                        msg.data.inverters[offset1]['power'][2] = apsInt(buf, offset2 + 19);\n                        msg.data.inverters[offset1]['power'][3] = apsInt(buf, offset2 + 21);\n\n                        msg.data.inverters[offset1]['power_instant'] += msg.data.inverters[offset1]['power'][1];\n                        msg.data.inverters[offset1]['power_instant'] += msg.data.inverters[offset1]['power'][2];\n                        msg.data.inverters[offset1]['power_instant'] += msg.data.inverters[offset1]['power'][3];\n\n                        offset2 = offset2 + 23;\n                    }\n                    else {\n                        offset2 = offset2 + 9;\n                    }\n\n                    // Send ECU inverter data\n                    if (typeof global.get('mqtt.host', 'default') === 'string') {\n                        let newMsg = {\n                            'topic': global.get('mqtt.topic', 'default') + '/inverter/' + msg.data.inverters[offset1]['id'],\n                            'payload': msg.data.inverters[offset1],\n                        };\n                        node.send([null, newMsg]);\n                    }\n                }\n\n                offset1++;\n            }\n        }\n    }\n\n    // CLeanup\n    delete msg.name;\n    delete msg.location;\n    delete msg.host;\n    delete msg.port;\n    msg.topic = global.get('mqtt.topic', 'default') + '/' + msg.data.ecu.id;\n    msg.payload = msg.data;\n\n    // Global\n    let controls = global.get('controls', 'memoryOnly');\n    if (typeof controls !== 'object') {\n        controls = {}\n    }\n    controls[msg.payload.ecu.host] = msg.payload;\n    global.set('controls', controls, 'memoryOnly');\n\n    node.status({text: msg.payload.ecu.inverters_online + ' / ' + msg.payload.ecu.inverters_quantity});\n\n    return;\n}\n",
         "outputs": 2,
         "timeout": 0,
         "noerr": 0,
@@ -2679,7 +2705,7 @@
         "z": "3300684acfa472e7",
         "g": "a94f12143daa85b5",
         "name": "custom - describe",
-        "func": "msg.payload.project = 'dknr-apsystems';\n\nmsg.payload.hmi = {\n    'detail': 'Surveiller',\n    'add': 'Ajouter',\n    'mqtt': 'Configurer'\n};\n\nreturn msg;",
+        "func": "msg.payload.project = 'dknr-apsystems';\n\nmsg.payload.hmi = {\n    'detail': 'Surveiller',\n    'add': 'Ajouter',\n    'mqtt': 'Configurer'\n};\n\nmsg.payload.names = {\n    'power_instant': 'Puissance instantanée',\n    'energy_total': 'Energie totale produite',\n    'voltage_mean': 'Voltage',\n    'frequency': 'Fréquence',\n    'temperature': 'Température'\n};\n\nmsg.payload.units = {\n    'power_instant': 'W',\n    'energy_total': 'kWh',\n    'voltage_mean': 'V',\n    'frequency': 'Hz',\n    'temperature': '°C'\n};\n\nmsg.payload.discovery_state_class = {\n    'power_instant': 'measurement',\n    'energy_total': 'total_increasing',\n    'voltage_mean': 'measurement',\n    'frequency': 'measurement',\n    'temperature': 'measurement'\n};\n\nmsg.payload.discovery_device_class = {\n    'power_instant': 'power',\n    'energy_total': 'energy',\n    'voltage_mean': 'voltage',\n    'frequency': 'frequency',\n    'temperature': 'temperature'\n};\n\nmsg.payload.discovery_value_template = {\n    'ecu': {\n        'power_instant': \"{% if 'power_instant' in value_json %}{{ value_json.power_instant }}{% endif %}\",\n        'energy_total': \"{% if 'energy_total' in value_json %}{{ value_json.energy_total }}{% endif %}\"\n    },\n    'inverter': {\n        'power_instant': \"{% if 'power_instant' in value_json %}{{ value_json.power_instant }}{% endif %}\",\n        'voltage_mean': \"{% if 'voltage_mean' in value_json %}{{ value_json.voltage_mean }}{% endif %}\",\n        'frequency': \"{% if 'frequency' in value_json %}{{ value_json.frequency }}{% endif %}\",\n        'temperature': \"{% if 'temperature' in value_json %}{{ value_json.temperature }}{% endif %}\"\n    },\n};\n\nreturn msg;",
         "outputs": 1,
         "timeout": 0,
         "noerr": 0,
@@ -2761,5 +2787,132 @@
         "x": 650,
         "y": 80,
         "wires": []
+    },
+    {
+        "id": "b66aceda104390c6",
+        "type": "link in",
+        "z": "3300684acfa472e7",
+        "g": "c2a4c908aa1cf2e9",
+        "name": "custom - discovery",
+        "links": [
+            "f2cd63b49ac325ec"
+        ],
+        "x": 665,
+        "y": 320,
+        "wires": [
+            [
+                "0ee0b69136e9646f"
+            ]
+        ]
+    },
+    {
+        "id": "e10ce118e77873bd",
+        "type": "debug",
+        "z": "3300684acfa472e7",
+        "g": "c2a4c908aa1cf2e9",
+        "name": "custom - discovery",
+        "active": true,
+        "tosidebar": true,
+        "console": false,
+        "tostatus": false,
+        "complete": "true",
+        "targetType": "full",
+        "statusVal": "",
+        "statusType": "auto",
+        "x": 1010,
+        "y": 380,
+        "wires": []
+    },
+    {
+        "id": "0ee0b69136e9646f",
+        "type": "function",
+        "z": "3300684acfa472e7",
+        "g": "c2a4c908aa1cf2e9",
+        "name": "discovery",
+        "func": "let enabled = global.get('mqtt.enabled', 'default') || false;\nlet discovery = global.get('mqtt.discovery', 'default') || '';\nlet topic = global.get('mqtt.topic', 'default') || '';\n\nif (enabled && discovery.length > 0) {\n    let describe = global.get('describe', 'memoryOnly') || {};\n    let controls = global.get('controls', 'memoryOnly') || {};\n    for (const host in controls) {\n        for (const type in describe.discovery_value_template) {\n            let stack = {};\n            if (type === 'ecu') {\n                stack = {'0': controls[host]['ecu']};\n            }\n            else {\n                stack = controls[host]['inverters'];\n            }\n            for (const s in stack) {\n                let id = stack[s]['id'];\n                for (const k in describe.discovery_value_template[type]) {\n                    msg.topic = discovery + '/sensor/apsystems_' + type + '/' + id + '_' + k + '/config';\n                    msg.payload = {\n                        'unique_id': 'apsystems_' + id + '_' + k,\n                        'name': describe.names[k],\n                        'state_topic': topic + '/' + type + '/' + id,\n                        'value_template': describe.discovery_value_template[type][k],\n                        'state_class': describe.discovery_state_class[k],\n                        'device_class': describe.discovery_device_class[k],\n                        'unit_of_measurement': describe.units[k],\n                        'device': {\n                            'identifiers': [\n                                id\n                            ],\n                            'manufacturer': 'APSystems',\n                            'model': 'aps_' + type + '_' + id,\n                            'name': 'APSystems ' + type + ' ' + id\n                        }\n                    };\n                    node.send(msg);\n                }\n            }\n        }\n    }\n}\n\nreturn;",
+        "outputs": 1,
+        "timeout": 0,
+        "noerr": 0,
+        "initialize": "",
+        "finalize": "",
+        "libs": [],
+        "x": 800,
+        "y": 320,
+        "wires": [
+            [
+                "e10ce118e77873bd",
+                "ace85f776ce24777"
+            ]
+        ]
+    },
+    {
+        "id": "6bbab610c03dcbda",
+        "type": "inject",
+        "z": "3300684acfa472e7",
+        "g": "c2a4c908aa1cf2e9",
+        "name": "custom - discovery",
+        "props": [
+            {
+                "p": "payload"
+            },
+            {
+                "p": "topic",
+                "vt": "str"
+            }
+        ],
+        "repeat": "",
+        "crontab": "",
+        "once": false,
+        "onceDelay": 0.1,
+        "topic": "",
+        "payload": "",
+        "payloadType": "str",
+        "x": 770,
+        "y": 380,
+        "wires": [
+            [
+                "0ee0b69136e9646f"
+            ]
+        ]
+    },
+    {
+        "id": "6326830faa9d7246",
+        "type": "link out",
+        "z": "3300684acfa472e7",
+        "g": "c2a4c908aa1cf2e9",
+        "name": "custom_discovery",
+        "mode": "link",
+        "links": [
+            "8704b93076a73d7e"
+        ],
+        "x": 1085,
+        "y": 320,
+        "wires": []
+    },
+    {
+        "id": "ace85f776ce24777",
+        "type": "delay",
+        "z": "3300684acfa472e7",
+        "g": "c2a4c908aa1cf2e9",
+        "name": "20ms",
+        "pauseType": "delay",
+        "timeout": "20",
+        "timeoutUnits": "milliseconds",
+        "rate": "1",
+        "nbRateUnits": "1",
+        "rateUnits": "second",
+        "randomFirst": "1",
+        "randomLast": "5",
+        "randomUnits": "seconds",
+        "drop": false,
+        "allowrate": false,
+        "outputs": 1,
+        "x": 970,
+        "y": 320,
+        "wires": [
+            [
+                "6326830faa9d7246"
+            ]
+        ]
     }
 ]
