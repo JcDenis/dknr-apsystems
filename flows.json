@@ -29,7 +29,7 @@
             "025edbd02daf82d0",
             "e121bb6441bf21e5"
         ],
-        "x": 94,
+        "x": 114,
         "y": 159,
         "w": 332,
         "h": 82
@@ -53,7 +53,7 @@
             "0d8b82affc70a074",
             "667f445784d1b506"
         ],
-        "x": 94,
+        "x": 114,
         "y": 39,
         "w": 1182,
         "h": 82
@@ -76,7 +76,7 @@
             "f2cd63b49ac325ec",
             "a61e338a90e40454"
         ],
-        "x": 84,
+        "x": 104,
         "y": 939,
         "w": 872,
         "h": 82
@@ -99,7 +99,7 @@
             "f60de1529c423dee",
             "f3c41b2acb15c9ea"
         ],
-        "x": 84,
+        "x": 104,
         "y": 399,
         "w": 502,
         "h": 142
@@ -119,7 +119,7 @@
             "fecaee88b8c296ed",
             "7f15feb966b47505"
         ],
-        "x": 84,
+        "x": 104,
         "y": 579,
         "w": 462,
         "h": 82
@@ -146,7 +146,7 @@
             "ab044268dd81617b",
             "9191b0ffe980eb70"
         ],
-        "x": 84,
+        "x": 104,
         "y": 699,
         "w": 1092,
         "h": 202
@@ -168,7 +168,7 @@
             "fe3a87fa930d465d",
             "37ef0dacd1f0e952"
         ],
-        "x": 94,
+        "x": 114,
         "y": 279,
         "w": 852,
         "h": 82
@@ -192,8 +192,8 @@
             "efbab03f220791d4",
             "5d415007badd7b01"
         ],
-        "x": 84,
-        "y": 519,
+        "x": 104,
+        "y": 699,
         "w": 872,
         "h": 142
     },
@@ -214,7 +214,7 @@
             "d82deb0a07d618ee",
             "0bf80703420c701e"
         ],
-        "x": 94,
+        "x": 114,
         "y": 279,
         "w": 432,
         "h": 202
@@ -258,8 +258,8 @@
             "9f279216041658c7",
             "da492ba229cc3b36"
         ],
-        "x": 84,
-        "y": 699,
+        "x": 104,
+        "y": 879,
         "w": 2282,
         "h": 442
     },
@@ -279,7 +279,7 @@
             "6f5df9d670b9906d",
             "e25fbb1e61c21f99"
         ],
-        "x": 84,
+        "x": 104,
         "y": 39,
         "w": 412,
         "h": 82
@@ -300,7 +300,7 @@
             "43663518deccb7c6",
             "4841db186251fd55"
         ],
-        "x": 84,
+        "x": 104,
         "y": 159,
         "w": 392,
         "h": 82
@@ -323,8 +323,8 @@
             "6326830faa9d7246",
             "ace85f776ce24777"
         ],
-        "x": 624,
-        "y": 279,
+        "x": 104,
+        "y": 519,
         "w": 522,
         "h": 142
     },
@@ -602,7 +602,7 @@
         "headers": {
             "Location": "/dashboard"
         },
-        "x": 340,
+        "x": 360,
         "y": 200,
         "wires": []
     },
@@ -617,7 +617,7 @@
         "upload": false,
         "skipBodyParsing": false,
         "swaggerDoc": "",
-        "x": 170,
+        "x": 190,
         "y": 200,
         "wires": [
             [
@@ -640,7 +640,7 @@
         "correl": "",
         "expiry": "",
         "broker": "2c5e094fee5ae877",
-        "x": 430,
+        "x": 450,
         "y": 440,
         "wires": []
     },
@@ -654,7 +654,7 @@
             "0bf80703420c701e",
             "6326830faa9d7246"
         ],
-        "x": 125,
+        "x": 145,
         "y": 500,
         "wires": [
             [
@@ -672,7 +672,7 @@
             "92c098c716e46e3b",
             "5d415007badd7b01"
         ],
-        "x": 125,
+        "x": 145,
         "y": 620,
         "wires": [
             [
@@ -702,7 +702,7 @@
         "topic": "",
         "payload": "{}",
         "payloadType": "jsonata",
-        "x": 190,
+        "x": 210,
         "y": 80,
         "wires": [
             [
@@ -724,7 +724,7 @@
             "df19be1275e79b1c",
             "f4a2353e5f92576c"
         ],
-        "x": 1235,
+        "x": 1255,
         "y": 80,
         "wires": []
     },
@@ -748,7 +748,7 @@
         "from": "",
         "to": "",
         "reg": false,
-        "x": 630,
+        "x": 650,
         "y": 980,
         "wires": [
             [
@@ -774,7 +774,7 @@
         "drop": false,
         "allowrate": false,
         "outputs": 1,
-        "x": 790,
+        "x": 810,
         "y": 980,
         "wires": [
             [
@@ -798,7 +798,7 @@
         "checkall": "false",
         "repair": false,
         "outputs": 1,
-        "x": 260,
+        "x": 280,
         "y": 500,
         "wires": [
             [
@@ -888,7 +888,7 @@
         "className": "",
         "passthru": false,
         "dropdownOptions": [],
-        "x": 440,
+        "x": 460,
         "y": 980,
         "wires": [
             [
@@ -907,7 +907,7 @@
             "92c098c716e46e3b",
             "f2cd63b49ac325ec"
         ],
-        "x": 125,
+        "x": 145,
         "y": 980,
         "wires": [
             [
@@ -927,7 +927,7 @@
             "df19be1275e79b1c",
             "b66aceda104390c6"
         ],
-        "x": 915,
+        "x": 935,
         "y": 980,
         "wires": []
     },
@@ -941,7 +941,7 @@
             "92c098c716e46e3b",
             "f2cd63b49ac325ec"
         ],
-        "x": 125,
+        "x": 145,
         "y": 440,
         "wires": [
             [
@@ -962,7 +962,7 @@
         "initialize": "",
         "finalize": "",
         "libs": [],
-        "x": 250,
+        "x": 270,
         "y": 440,
         "wires": [
             [
@@ -978,7 +978,7 @@
         "name": "common - ui - control",
         "ui": "df7710b4b2c4e55b",
         "events": "all",
-        "x": 300,
+        "x": 320,
         "y": 860,
         "wires": [
             [
@@ -998,7 +998,7 @@
             "b9e756ce9dd6756f",
             "550fd37cdd043e4d"
         ],
-        "x": 1135,
+        "x": 1155,
         "y": 860,
         "wires": []
     },
@@ -1009,7 +1009,7 @@
         "g": "614d71e9e019ca82",
         "name": "ui - control",
         "links": [],
-        "x": 125,
+        "x": 145,
         "y": 860,
         "wires": [
             [
@@ -1036,7 +1036,7 @@
         "raw": false,
         "className": "",
         "name": "common - error",
-        "x": 440,
+        "x": 460,
         "y": 620,
         "wires": [
             []
@@ -1058,7 +1058,7 @@
         "checkall": "false",
         "repair": false,
         "outputs": 1,
-        "x": 250,
+        "x": 270,
         "y": 620,
         "wires": [
             [
@@ -1079,7 +1079,7 @@
         "sendError": false,
         "encoding": "none",
         "allProps": false,
-        "x": 770,
+        "x": 790,
         "y": 80,
         "wires": [
             [
@@ -1096,7 +1096,7 @@
         "property": "payload",
         "action": "",
         "pretty": false,
-        "x": 950,
+        "x": 970,
         "y": 80,
         "wires": [
             [
@@ -1110,14 +1110,14 @@
         "z": "4bc72a1112cb448c",
         "g": "bcc6f36c217d1643",
         "name": "app",
-        "func": "delete msg.filename;\n\nif (typeof msg.payload === 'object') {\n    let describe = global.get('describe', 'memoryOnly') || {};\n    describe.app = {\n        'title': msg.payload.description,\n        'version' : msg.payload.version,\n        'git': msg.payload.name\n    };\n    global.set('describe', describe, 'memoryOnly');\n}\nreturn msg;",
+        "func": "delete msg.filename;\n\nif (typeof msg.payload === 'object') {\n    let describe = global.get('describe', 'memoryOnly') || {};\n    describe.app = {\n        'title': msg.payload.description.slice(5), // remove \"DKNR \"\n        'version' : msg.payload.version,\n        'git': msg.payload.name\n    };\n    global.set('describe', describe, 'memoryOnly');\n}\nreturn msg;",
         "outputs": 1,
         "timeout": 0,
         "noerr": 0,
         "initialize": "",
         "finalize": "",
         "libs": [],
-        "x": 1110,
+        "x": 1130,
         "y": 80,
         "wires": [
             [
@@ -1138,7 +1138,7 @@
         "sendError": false,
         "encoding": "none",
         "allProps": false,
-        "x": 530,
+        "x": 550,
         "y": 320,
         "wires": [
             [
@@ -1157,7 +1157,7 @@
         "upload": false,
         "skipBodyParsing": false,
         "swaggerDoc": "",
-        "x": 190,
+        "x": 210,
         "y": 320,
         "wires": [
             [
@@ -1185,7 +1185,7 @@
         "from": "",
         "to": "",
         "reg": false,
-        "x": 370,
+        "x": 390,
         "y": 320,
         "wires": [
             [
@@ -1232,7 +1232,7 @@
         "from": "",
         "to": "",
         "reg": false,
-        "x": 700,
+        "x": 720,
         "y": 320,
         "wires": [
             [
@@ -1248,7 +1248,7 @@
         "name": "",
         "statusCode": "",
         "headers": {},
-        "x": 870,
+        "x": 890,
         "y": 320,
         "wires": []
     },
@@ -1265,7 +1265,7 @@
         "initialize": "",
         "finalize": "",
         "libs": [],
-        "x": 690,
+        "x": 710,
         "y": 800,
         "wires": [
             [
@@ -1286,7 +1286,7 @@
         "initialize": "",
         "finalize": "",
         "libs": [],
-        "x": 850,
+        "x": 870,
         "y": 860,
         "wires": [
             [
@@ -1317,7 +1317,7 @@
         "resendOnRefresh": true,
         "templateScope": "site:style",
         "className": "",
-        "x": 290,
+        "x": 310,
         "y": 740,
         "wires": [
             []
@@ -1341,7 +1341,7 @@
         "drop": false,
         "allowrate": false,
         "outputs": 1,
-        "x": 1010,
+        "x": 1030,
         "y": 860,
         "wires": [
             [
@@ -1360,7 +1360,7 @@
         ],
         "linkType": "static",
         "timeout": "30",
-        "x": 390,
+        "x": 410,
         "y": 80,
         "wires": [
             [
@@ -1381,7 +1381,7 @@
         "initialize": "",
         "finalize": "",
         "libs": [],
-        "x": 590,
+        "x": 610,
         "y": 80,
         "wires": [
             [
@@ -1399,7 +1399,7 @@
         "links": [
             "70fa44d509342200"
         ],
-        "x": 975,
+        "x": 995,
         "y": 800,
         "wires": []
     },
@@ -1412,7 +1412,7 @@
         "links": [
             "43663518deccb7c6"
         ],
-        "x": 125,
+        "x": 145,
         "y": 800,
         "wires": [
             [
@@ -1441,7 +1441,7 @@
         "from": "",
         "to": "",
         "reg": false,
-        "x": 520,
+        "x": 540,
         "y": 860,
         "wires": [
             [
@@ -1463,7 +1463,7 @@
         "targetType": "full",
         "statusVal": "",
         "statusType": "auto",
-        "x": 460,
+        "x": 480,
         "y": 500,
         "wires": []
     },
@@ -1480,7 +1480,7 @@
         "initialize": "",
         "finalize": "",
         "libs": [],
-        "x": 250,
+        "x": 270,
         "y": 980,
         "wires": [
             [
@@ -1500,8 +1500,8 @@
             "8e74082b23e26d09",
             "5d415007badd7b01"
         ],
-        "x": 125,
-        "y": 560,
+        "x": 145,
+        "y": 740,
         "wires": [
             [
                 "e15a1f4c9b2ebe8f"
@@ -1589,8 +1589,8 @@
                 "label": "ECU-C"
             }
         ],
-        "x": 450,
-        "y": 560,
+        "x": 470,
+        "y": 740,
         "wires": [
             [
                 "efbab03f220791d4"
@@ -1607,8 +1607,8 @@
         "links": [
             "b9e756ce9dd6756f"
         ],
-        "x": 915,
-        "y": 560,
+        "x": 935,
+        "y": 740,
         "wires": []
     },
     {
@@ -1629,8 +1629,8 @@
         "drop": false,
         "allowrate": false,
         "outputs": 1,
-        "x": 790,
-        "y": 560,
+        "x": 810,
+        "y": 740,
         "wires": [
             [
                 "8e74082b23e26d09"
@@ -1650,8 +1650,8 @@
         "initialize": "",
         "finalize": "",
         "libs": [],
-        "x": 250,
-        "y": 560,
+        "x": 270,
+        "y": 740,
         "wires": [
             [
                 "bf39d2a0b6757d31"
@@ -1671,8 +1671,8 @@
         "initialize": "",
         "finalize": "",
         "libs": [],
-        "x": 630,
-        "y": 560,
+        "x": 650,
+        "y": 740,
         "wires": [
             [
                 "f9e9e9dd56fec255"
@@ -1693,8 +1693,8 @@
             "b9e756ce9dd6756f",
             "f4a2353e5f92576c"
         ],
-        "x": 755,
-        "y": 620,
+        "x": 775,
+        "y": 800,
         "wires": []
     },
     {
@@ -1724,7 +1724,7 @@
                 "solarEvents": "sunrise,sunset"
             }
         ],
-        "x": 190,
+        "x": 210,
         "y": 320,
         "wires": [
             [
@@ -1746,7 +1746,7 @@
         "targetType": "full",
         "statusVal": "",
         "statusType": "auto",
-        "x": 410,
+        "x": 430,
         "y": 440,
         "wires": []
     },
@@ -1763,7 +1763,7 @@
         "initialize": "",
         "finalize": "",
         "libs": [],
-        "x": 210,
+        "x": 230,
         "y": 380,
         "wires": [
             [
@@ -1789,7 +1789,7 @@
         "newline": "",
         "trim": false,
         "tls": "",
-        "x": 210,
+        "x": 230,
         "y": 440,
         "wires": [
             [
@@ -1807,7 +1807,7 @@
         "links": [
             "8704b93076a73d7e"
         ],
-        "x": 355,
+        "x": 375,
         "y": 380,
         "wires": []
     },
@@ -1829,8 +1829,8 @@
         "drop": false,
         "allowrate": false,
         "outputs": 1,
-        "x": 1810,
-        "y": 740,
+        "x": 1830,
+        "y": 920,
         "wires": [
             [
                 "f2ba5712ec8cd4b1"
@@ -1848,8 +1848,8 @@
             "92c098c716e46e3b",
             "f2ba5712ec8cd4b1"
         ],
-        "x": 125,
-        "y": 1100,
+        "x": 145,
+        "y": 1280,
         "wires": [
             [
                 "46d41095c9cd81bb",
@@ -1870,8 +1870,8 @@
         "initialize": "",
         "finalize": "",
         "libs": [],
-        "x": 290,
-        "y": 980,
+        "x": 310,
+        "y": 1160,
         "wires": [
             [
                 "2cd010eee2da8e29"
@@ -1910,8 +1910,8 @@
         "className": "",
         "typeIsComboBox": true,
         "msgTrigger": "onChange",
-        "x": 510,
-        "y": 1040,
+        "x": 530,
+        "y": 1220,
         "wires": [
             [
                 "cf1550b97074514c"
@@ -1937,8 +1937,8 @@
         "checkall": "false",
         "repair": false,
         "outputs": 2,
-        "x": 710,
-        "y": 1040,
+        "x": 730,
+        "y": 1220,
         "wires": [
             [
                 "2cd010eee2da8e29"
@@ -1969,8 +1969,8 @@
         "checkall": "false",
         "repair": false,
         "outputs": 2,
-        "x": 870,
-        "y": 980,
+        "x": 890,
+        "y": 1160,
         "wires": [
             [
                 "c158788b3b968b34",
@@ -2015,8 +2015,8 @@
         "from": "",
         "to": "",
         "reg": false,
-        "x": 1230,
-        "y": 980,
+        "x": 1250,
+        "y": 1160,
         "wires": [
             [
                 "263e38e78c31cbec",
@@ -2058,8 +2058,8 @@
         "from": "",
         "to": "",
         "reg": false,
-        "x": 1230,
-        "y": 1100,
+        "x": 1250,
+        "y": 1280,
         "wires": [
             [
                 "263e38e78c31cbec",
@@ -2090,8 +2090,8 @@
         "from": "",
         "to": "",
         "reg": false,
-        "x": 530,
-        "y": 920,
+        "x": 550,
+        "y": 1100,
         "wires": [
             [
                 "bc17c08e18a403b2"
@@ -2116,8 +2116,8 @@
         "drop": false,
         "allowrate": false,
         "outputs": 1,
-        "x": 690,
-        "y": 920,
+        "x": 710,
+        "y": 1100,
         "wires": [
             [
                 "c03d7fe0c37957cf"
@@ -2142,8 +2142,8 @@
         "checkall": "false",
         "repair": false,
         "outputs": 1,
-        "x": 860,
-        "y": 920,
+        "x": 880,
+        "y": 1100,
         "wires": [
             [
                 "c158788b3b968b34"
@@ -2184,8 +2184,8 @@
         "from": "",
         "to": "",
         "reg": false,
-        "x": 1030,
-        "y": 920,
+        "x": 1050,
+        "y": 1100,
         "wires": [
             [
                 "3fe540fa0313af8e",
@@ -2227,8 +2227,8 @@
         "enablePointerup": false,
         "pointerupPayload": "",
         "pointerupPayloadType": "str",
-        "x": 1440,
-        "y": 740,
+        "x": 1460,
+        "y": 920,
         "wires": [
             [
                 "91dbd54711396594"
@@ -2260,8 +2260,8 @@
         "from": "",
         "to": "",
         "reg": false,
-        "x": 1650,
-        "y": 740,
+        "x": 1670,
+        "y": 920,
         "wires": [
             [
                 "01346f67f027524a"
@@ -2278,8 +2278,8 @@
         "links": [
             "550fd37cdd043e4d"
         ],
-        "x": 1935,
-        "y": 740,
+        "x": 1955,
+        "y": 920,
         "wires": []
     },
     {
@@ -2295,8 +2295,8 @@
         "initialize": "",
         "finalize": "",
         "libs": [],
-        "x": 1220,
-        "y": 800,
+        "x": 1240,
+        "y": 980,
         "wires": [
             [
                 "f7d3e7cde4634e66"
@@ -2342,8 +2342,8 @@
         "mobileBreakpointType": "defaults",
         "action": "replace",
         "className": "",
-        "x": 1470,
-        "y": 800,
+        "x": 1490,
+        "y": 980,
         "wires": [
             []
         ]
@@ -2361,8 +2361,8 @@
         "initialize": "",
         "finalize": "",
         "libs": [],
-        "x": 1210,
-        "y": 860,
+        "x": 1230,
+        "y": 1040,
         "wires": [
             [
                 "84750319a3a2463b"
@@ -2408,8 +2408,8 @@
         "mobileBreakpointType": "defaults",
         "action": "replace",
         "className": "",
-        "x": 1480,
-        "y": 860,
+        "x": 1500,
+        "y": 1040,
         "wires": [
             []
         ]
@@ -2427,8 +2427,8 @@
         "initialize": "",
         "finalize": "",
         "libs": [],
-        "x": 1220,
-        "y": 920,
+        "x": 1240,
+        "y": 1100,
         "wires": [
             [
                 "f7441e7b64e4cea3"
@@ -2464,8 +2464,8 @@
         "className": "",
         "typeIsComboBox": false,
         "msgTrigger": "onChange",
-        "x": 1470,
-        "y": 920,
+        "x": 1490,
+        "y": 1100,
         "wires": [
             [
                 "7d8de98aa71ecc40"
@@ -2485,8 +2485,8 @@
         "initialize": "",
         "finalize": "",
         "libs": [],
-        "x": 1720,
-        "y": 920,
+        "x": 1740,
+        "y": 1100,
         "wires": [
             [
                 "8c1baae83dae667e",
@@ -2510,8 +2510,8 @@
         "initialize": "",
         "finalize": "",
         "libs": [],
-        "x": 1910,
-        "y": 860,
+        "x": 1930,
+        "y": 1040,
         "wires": [
             [
                 "0a26b25c7f5f0f97"
@@ -2552,8 +2552,8 @@
         "from": "",
         "to": "",
         "reg": false,
-        "x": 1930,
-        "y": 1100,
+        "x": 1950,
+        "y": 1280,
         "wires": [
             [
                 "0a26b25c7f5f0f97",
@@ -2600,8 +2600,8 @@
         "mobileBreakpointType": "defaults",
         "action": "replace",
         "className": "",
-        "x": 2180,
-        "y": 860,
+        "x": 2200,
+        "y": 1040,
         "wires": [
             []
         ]
@@ -2619,8 +2619,8 @@
         "initialize": "",
         "finalize": "",
         "libs": [],
-        "x": 1920,
-        "y": 920,
+        "x": 1940,
+        "y": 1100,
         "wires": [
             [
                 "da492ba229cc3b36"
@@ -2666,8 +2666,8 @@
         "mobileBreakpointType": "defaults",
         "action": "replace",
         "className": "",
-        "x": 2190,
-        "y": 920,
+        "x": 2210,
+        "y": 1100,
         "wires": [
             []
         ]
@@ -2679,7 +2679,7 @@
         "g": "a94f12143daa85b5",
         "name": "custom - describe",
         "links": [],
-        "x": 125,
+        "x": 145,
         "y": 80,
         "wires": [
             [
@@ -2695,7 +2695,7 @@
         "name": "custom - describe",
         "mode": "return",
         "links": [],
-        "x": 455,
+        "x": 475,
         "y": 80,
         "wires": []
     },
@@ -2705,14 +2705,14 @@
         "z": "3300684acfa472e7",
         "g": "a94f12143daa85b5",
         "name": "custom - describe",
-        "func": "msg.payload.project = 'dknr-apsystems';\n\nmsg.payload.hmi = {\n    'detail': 'Surveiller',\n    'add': 'Ajouter',\n    'mqtt': 'Configurer'\n};\n\nmsg.payload.names = {\n    'power_instant': 'Puissance instantanée',\n    'energy_total': 'Energie totale produite',\n    'voltage_mean': 'Voltage',\n    'frequency': 'Fréquence',\n    'temperature': 'Température'\n};\n\nmsg.payload.units = {\n    'power_instant': 'W',\n    'energy_total': 'kWh',\n    'voltage_mean': 'V',\n    'frequency': 'Hz',\n    'temperature': '°C'\n};\n\nmsg.payload.discovery_state_class = {\n    'power_instant': 'measurement',\n    'energy_total': 'total_increasing',\n    'voltage_mean': 'measurement',\n    'frequency': 'measurement',\n    'temperature': 'measurement'\n};\n\nmsg.payload.discovery_device_class = {\n    'power_instant': 'power',\n    'energy_total': 'energy',\n    'voltage_mean': 'voltage',\n    'frequency': 'frequency',\n    'temperature': 'temperature'\n};\n\nmsg.payload.discovery_value_template = {\n    'ecu': {\n        'power_instant': \"{% if 'power_instant' in value_json %}{{ value_json.power_instant }}{% endif %}\",\n        'energy_total': \"{% if 'energy_total' in value_json %}{{ value_json.energy_total }}{% endif %}\"\n    },\n    'inverter': {\n        'power_instant': \"{% if 'power_instant' in value_json %}{{ value_json.power_instant }}{% endif %}\",\n        'voltage_mean': \"{% if 'voltage_mean' in value_json %}{{ value_json.voltage_mean }}{% endif %}\",\n        'frequency': \"{% if 'frequency' in value_json %}{{ value_json.frequency }}{% endif %}\",\n        'temperature': \"{% if 'temperature' in value_json %}{{ value_json.temperature }}{% endif %}\"\n    },\n};\n\nreturn msg;",
+        "func": "msg.payload.project = 'dknr-apsystems';\n\nmsg.payload.hmi = {\n    'detail': 'Surveiller',\n    'add': 'Ajouter',\n    'mqtt': 'Configurer'\n};\n\nmsg.payload.label = {\n    'power_instant': 'Puissance instantanée',\n    'energy_total': 'Energie totale produite',\n    'voltage_mean': 'Voltage',\n    'frequency': 'Fréquence',\n    'temperature': 'Température'\n};\n\nmsg.payload.unit = {\n    'power_instant': 'W',\n    'energy_total': 'kWh',\n    'voltage_mean': 'V',\n    'frequency': 'Hz',\n    'temperature': '°C'\n};\n\nmsg.payload.type = {\n    'power_instant': 'sensor',\n    'energy_total': 'sensor',\n    'voltage_mean': 'sensor',\n    'frequency': 'sensor',\n    'temperature': 'sensor'\n};\n\nmsg.payload.discovery_state_class = {\n    'power_instant': 'measurement',\n    'energy_total': 'total_increasing',\n    'voltage_mean': 'measurement',\n    'frequency': 'measurement',\n    'temperature': 'measurement'\n};\n\nmsg.payload.discovery_device_class = {\n    'power_instant': 'power',\n    'energy_total': 'energy',\n    'voltage_mean': 'voltage',\n    'frequency': 'frequency',\n    'temperature': 'temperature'\n};\n\nmsg.payload.discovery_value_template = {\n    'ecu': {\n        'power_instant': \"{% if 'power_instant' in value_json %}{{ value_json.power_instant }}{% endif %}\",\n        'energy_total': \"{% if 'energy_total' in value_json %}{{ value_json.energy_total }}{% endif %}\"\n    },\n    'inverter': {\n        'power_instant': \"{% if 'power_instant' in value_json %}{{ value_json.power_instant }}{% endif %}\",\n        'voltage_mean': \"{% if 'voltage_mean' in value_json %}{{ value_json.voltage_mean }}{% endif %}\",\n        'frequency': \"{% if 'frequency' in value_json %}{{ value_json.frequency }}{% endif %}\",\n        'temperature': \"{% if 'temperature' in value_json %}{{ value_json.temperature }}{% endif %}\"\n    },\n};\n\nreturn msg;",
         "outputs": 1,
         "timeout": 0,
         "noerr": 0,
         "initialize": "",
         "finalize": "",
         "libs": [],
-        "x": 290,
+        "x": 310,
         "y": 80,
         "wires": [
             [
@@ -2729,7 +2729,7 @@
         "links": [
             "5c9bfdd80f490de0"
         ],
-        "x": 125,
+        "x": 145,
         "y": 200,
         "wires": [
             [
@@ -2747,7 +2747,7 @@
         "links": [
             "ab044268dd81617b"
         ],
-        "x": 435,
+        "x": 455,
         "y": 200,
         "wires": []
     },
@@ -2770,7 +2770,7 @@
         "resendOnRefresh": true,
         "templateScope": "widget:ui",
         "className": "",
-        "x": 280,
+        "x": 300,
         "y": 200,
         "wires": [
             [
@@ -2797,8 +2797,8 @@
         "links": [
             "f2cd63b49ac325ec"
         ],
-        "x": 665,
-        "y": 320,
+        "x": 145,
+        "y": 560,
         "wires": [
             [
                 "0ee0b69136e9646f"
@@ -2811,7 +2811,7 @@
         "z": "3300684acfa472e7",
         "g": "c2a4c908aa1cf2e9",
         "name": "custom - discovery",
-        "active": true,
+        "active": false,
         "tosidebar": true,
         "console": false,
         "tostatus": false,
@@ -2819,8 +2819,8 @@
         "targetType": "full",
         "statusVal": "",
         "statusType": "auto",
-        "x": 1010,
-        "y": 380,
+        "x": 490,
+        "y": 620,
         "wires": []
     },
     {
@@ -2829,15 +2829,15 @@
         "z": "3300684acfa472e7",
         "g": "c2a4c908aa1cf2e9",
         "name": "discovery",
-        "func": "let enabled = global.get('mqtt.enabled', 'default') || false;\nlet discovery = global.get('mqtt.discovery', 'default') || '';\nlet topic = global.get('mqtt.topic', 'default') || '';\n\nif (enabled && discovery.length > 0) {\n    let describe = global.get('describe', 'memoryOnly') || {};\n    let controls = global.get('controls', 'memoryOnly') || {};\n    for (const host in controls) {\n        for (const type in describe.discovery_value_template) {\n            let stack = {};\n            if (type === 'ecu') {\n                stack = {'0': controls[host]['ecu']};\n            }\n            else {\n                stack = controls[host]['inverters'];\n            }\n            for (const s in stack) {\n                let id = stack[s]['id'];\n                for (const k in describe.discovery_value_template[type]) {\n                    msg.topic = discovery + '/sensor/apsystems_' + type + '/' + id + '_' + k + '/config';\n                    msg.payload = {\n                        'unique_id': 'apsystems_' + id + '_' + k,\n                        'name': describe.names[k],\n                        'state_topic': topic + '/' + type + '/' + id,\n                        'value_template': describe.discovery_value_template[type][k],\n                        'state_class': describe.discovery_state_class[k],\n                        'device_class': describe.discovery_device_class[k],\n                        'unit_of_measurement': describe.units[k],\n                        'device': {\n                            'identifiers': [\n                                id\n                            ],\n                            'manufacturer': 'APSystems',\n                            'model': 'aps_' + type + '_' + id,\n                            'name': 'APSystems ' + type + ' ' + id\n                        }\n                    };\n                    node.send(msg);\n                }\n            }\n        }\n    }\n}\n\nreturn;",
+        "func": "let enabled = global.get('mqtt.enabled', 'default') || false;\nlet discovery = global.get('mqtt.discovery', 'default') || '';\nlet topic = global.get('mqtt.topic', 'default') || '';\n\nif (enabled && discovery.length > 0) {\n    let describe = global.get('describe', 'memoryOnly') || {};\n    let controls = global.get('controls', 'memoryOnly') || {};\n    for (const host in controls) {\n        for (const type in describe.discovery_value_template) {\n            let stack = {};\n            if (type === 'ecu') {\n                stack = {'0': controls[host]['ecu']};\n            }\n            else {\n                stack = controls[host]['inverters'];\n            }\n            for (const s in stack) {\n                let id = stack[s]['id'];\n                for (const k in describe.discovery_value_template[type]) {\n                    // !!! limit to sensor for now\n                    if (describe.type[k] === 'sensor') {\n                        msg.topic = discovery + '/' + describe.type[k] + '/apsystems_' + type + '/' + id + '_' + k + '/config';\n                        msg.payload = {\n                            'unique_id': 'apsystems_' + id + '_' + k,\n                            'name': describe.label[k],\n                            'state_topic': topic + '/' + type + '/' + id,\n                            'value_template': describe.discovery_value_template[type][k],\n                            'state_class': describe.discovery_state_class[k],\n                            'device_class': describe.discovery_device_class[k],\n                            'unit_of_measurement': describe.unit[k],\n                            'device': {\n                                'identifiers': [\n                                    id\n                                ],\n                                'manufacturer': 'APSystems',\n                                'model': 'aps_' + type + '_' + id,\n                                'name': 'APSystems ' + type + ' ' + id\n                            }\n                        };\n                        node.send(msg);\n                    }\n                }\n            }\n        }\n    }\n}\n\nreturn;",
         "outputs": 1,
         "timeout": 0,
         "noerr": 0,
         "initialize": "",
         "finalize": "",
         "libs": [],
-        "x": 800,
-        "y": 320,
+        "x": 280,
+        "y": 560,
         "wires": [
             [
                 "e10ce118e77873bd",
@@ -2867,8 +2867,8 @@
         "topic": "",
         "payload": "",
         "payloadType": "str",
-        "x": 770,
-        "y": 380,
+        "x": 250,
+        "y": 620,
         "wires": [
             [
                 "0ee0b69136e9646f"
@@ -2885,8 +2885,8 @@
         "links": [
             "8704b93076a73d7e"
         ],
-        "x": 1085,
-        "y": 320,
+        "x": 565,
+        "y": 560,
         "wires": []
     },
     {
@@ -2907,8 +2907,8 @@
         "drop": false,
         "allowrate": false,
         "outputs": 1,
-        "x": 970,
-        "y": 320,
+        "x": 450,
+        "y": 560,
         "wires": [
             [
                 "6326830faa9d7246"
