@@ -633,7 +633,7 @@
         "name": "mqtt",
         "topic": "",
         "qos": "0",
-        "retain": "false",
+        "retain": "",
         "respTopic": "",
         "contentType": "",
         "userProps": "",
