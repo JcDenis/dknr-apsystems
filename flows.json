@@ -212,11 +212,12 @@
             "cd522600a32e953e",
             "3538a60e6e05ade1",
             "d82deb0a07d618ee",
-            "0bf80703420c701e"
+            "0bf80703420c701e",
+            "8d08d306a7d73149"
         ],
-        "x": 114,
+        "x": 94,
         "y": 279,
-        "w": 432,
+        "w": 612,
         "h": 202
     },
     {
@@ -323,10 +324,38 @@
             "6326830faa9d7246",
             "ace85f776ce24777"
         ],
-        "x": 104,
+        "x": 94,
         "y": 519,
-        "w": 522,
+        "w": 652,
         "h": 142
+    },
+    {
+        "id": "9581755350badec0",
+        "type": "group",
+        "z": "3300684acfa472e7",
+        "name": "custom - history",
+        "style": {
+            "fill": "#6f2fa0",
+            "fill-opacity": "0.05",
+            "label": true
+        },
+        "nodes": [
+            "b192a639e9276aba",
+            "08e75d024187fe5c",
+            "96a75a2b4de5cf41",
+            "28b022cdd1712de1",
+            "a20fbb533e99b8a5",
+            "dde0045883add229",
+            "0cb7e701273f949e",
+            "b12b3c7ebef4af5a",
+            "283835c234d0a142",
+            "f6ddd941e41fdf0f",
+            "a8772ca27e87b0fb"
+        ],
+        "x": 94,
+        "y": 1359,
+        "w": 1392,
+        "h": 322
     },
     {
         "id": "df7710b4b2c4e55b",
@@ -1777,7 +1806,7 @@
             }
         ],
         "x": 210,
-        "y": 320,
+        "y": 440,
         "wires": [
             [
                 "3538a60e6e05ade1"
@@ -1798,8 +1827,8 @@
         "targetType": "full",
         "statusVal": "",
         "statusType": "auto",
-        "x": 430,
-        "y": 440,
+        "x": 590,
+        "y": 320,
         "wires": []
     },
     {
@@ -1815,7 +1844,7 @@
         "initialize": "",
         "finalize": "",
         "libs": [],
-        "x": 230,
+        "x": 390,
         "y": 380,
         "wires": [
             [
@@ -1826,7 +1855,7 @@
                 "0bf80703420c701e"
             ],
             [
-                "08e75d024187fe5c"
+                "8d08d306a7d73149"
             ]
         ]
     },
@@ -1844,8 +1873,8 @@
         "newline": "",
         "trim": false,
         "tls": "",
-        "x": 230,
-        "y": 440,
+        "x": 190,
+        "y": 320,
         "wires": [
             [
                 "3538a60e6e05ade1"
@@ -1862,7 +1891,7 @@
         "links": [
             "8704b93076a73d7e"
         ],
-        "x": 375,
+        "x": 535,
         "y": 380,
         "wires": []
     },
@@ -2852,7 +2881,7 @@
         "links": [
             "f2cd63b49ac325ec"
         ],
-        "x": 145,
+        "x": 265,
         "y": 560,
         "wires": [
             [
@@ -2874,7 +2903,7 @@
         "targetType": "full",
         "statusVal": "",
         "statusType": "auto",
-        "x": 490,
+        "x": 610,
         "y": 620,
         "wires": []
     },
@@ -2891,7 +2920,7 @@
         "initialize": "",
         "finalize": "",
         "libs": [],
-        "x": 280,
+        "x": 400,
         "y": 560,
         "wires": [
             [
@@ -2922,7 +2951,7 @@
         "topic": "",
         "payload": "",
         "payloadType": "str",
-        "x": 270,
+        "x": 210,
         "y": 620,
         "wires": [
             [
@@ -2940,7 +2969,7 @@
         "links": [
             "8704b93076a73d7e"
         ],
-        "x": 565,
+        "x": 685,
         "y": 560,
         "wires": []
     },
@@ -2962,7 +2991,7 @@
         "drop": false,
         "allowrate": false,
         "outputs": 1,
-        "x": 450,
+        "x": 570,
         "y": 560,
         "wires": [
             [
@@ -2971,40 +3000,13 @@
         ]
     },
     {
-        "id": "9581755350badec0",
-        "type": "group",
-        "z": "3300684acfa472e7",
-        "name": "custom - history",
-        "style": {
-            "fill": "#6f2fa0",
-            "fill-opacity": "0.05",
-            "label": true
-        },
-        "nodes": [
-            "b192a639e9276aba",
-            "08e75d024187fe5c",
-            "96a75a2b4de5cf41",
-            "28b022cdd1712de1",
-            "a20fbb533e99b8a5",
-            "dde0045883add229",
-            "0cb7e701273f949e",
-            "b12b3c7ebef4af5a",
-            "283835c234d0a142",
-            "f6ddd941e41fdf0f"
-        ],
-        "x": 80,
-        "y": 1360,
-        "w": 1200,
-        "h": 300
-    },
-    {
         "id": "b192a639e9276aba",
         "type": "comment",
         "z": "3300684acfa472e7",
         "g": "9581755350badec0",
         "name": "InfluxDB : DKNR_INFLUX_URL, DKNR_INFLUX_TOKEN, DKNR_INFLUX_ORG, DKNR_INFLUX_BUCKET (valeurs par défaut : conteneur dknr_apsystems_influxdb)",
         "info": "La production de chaque ECU est écrite à chaque lecture (toutes les 5 minutes) dans la mesure `apsystems` (tag `ecu`) : energy_total, energy_today, power_instant...\nLa production est calculée par InfluxDB : dernier index de chaque fenêtre moins dernier index de la fenêtre précédente (energy_today pour les heures, plus précis, energy_total sinon).",
-        "x": 480,
+        "x": 910,
         "y": 1400,
         "wires": []
     },
@@ -3021,7 +3023,7 @@
         "initialize": "",
         "finalize": "",
         "libs": [],
-        "x": 300,
+        "x": 440,
         "y": 1460,
         "wires": [
             [
@@ -3046,7 +3048,7 @@
         "authType": "",
         "senderr": false,
         "headers": [],
-        "x": 520,
+        "x": 660,
         "y": 1460,
         "wires": [
             [
@@ -3067,7 +3069,7 @@
         "initialize": "",
         "finalize": "",
         "libs": [],
-        "x": 720,
+        "x": 870,
         "y": 1460,
         "wires": []
     },
@@ -3080,8 +3082,8 @@
         "links": [
             "911bbe32f79bec46"
         ],
-        "x": 185,
-        "y": 1540,
+        "x": 285,
+        "y": 1580,
         "wires": [
             [
                 "0cb7e701273f949e"
@@ -3106,7 +3108,7 @@
         "onceDelay": 0.1,
         "topic": "refresh",
         "x": 220,
-        "y": 1580,
+        "y": 1640,
         "wires": [
             [
                 "0cb7e701273f949e"
@@ -3126,8 +3128,8 @@
         "initialize": "",
         "finalize": "",
         "libs": [],
-        "x": 410,
-        "y": 1560,
+        "x": 440,
+        "y": 1580,
         "wires": [
             [
                 "b12b3c7ebef4af5a"
@@ -3154,8 +3156,8 @@
         "authType": "",
         "senderr": false,
         "headers": [],
-        "x": 630,
-        "y": 1540,
+        "x": 680,
+        "y": 1520,
         "wires": [
             [
                 "283835c234d0a142"
@@ -3175,8 +3177,8 @@
         "initialize": "",
         "finalize": "",
         "libs": [],
-        "x": 830,
-        "y": 1560,
+        "x": 880,
+        "y": 1520,
         "wires": [
             [
                 "b12b3c7ebef4af5a"
@@ -3205,12 +3207,43 @@
         "resendOnRefresh": true,
         "templateScope": "local",
         "className": "",
-        "x": 1060,
-        "y": 1620,
+        "x": 1130,
+        "y": 1580,
         "wires": [
             [
                 "0cb7e701273f949e"
             ]
         ]
+    },
+    {
+        "id": "a8772ca27e87b0fb",
+        "type": "link in",
+        "z": "3300684acfa472e7",
+        "g": "9581755350badec0",
+        "name": "custom - history - port",
+        "links": [
+            "8d08d306a7d73149"
+        ],
+        "x": 285,
+        "y": 1460,
+        "wires": [
+            [
+                "08e75d024187fe5c"
+            ]
+        ]
+    },
+    {
+        "id": "8d08d306a7d73149",
+        "type": "link out",
+        "z": "3300684acfa472e7",
+        "g": "f880574ac1875493",
+        "name": "custom - port - history",
+        "mode": "link",
+        "links": [
+            "a8772ca27e87b0fb"
+        ],
+        "x": 535,
+        "y": 440,
+        "wires": []
     }
 ]
