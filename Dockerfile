@@ -11,7 +11,11 @@ ENV DKNR_USERNAME=admin \
       DKNR_SECRET=dkteleinfo \
       DKNR_REPOSITORY=https://github.com/JcDenis/dknr-apsystems \
       NODE_RED_ENABLE_PROJECTS=true \
-	TZ=Europe\Paris
+      DKNR_INFLUX_URL=http://dknr_apsystems_influxdb:8086 \
+      DKNR_INFLUX_TOKEN=dknr-apsystems-influxdb-token \
+      DKNR_INFLUX_ORG=dknr \
+      DKNR_INFLUX_BUCKET=apsystems \
+	TZ=Europe/Paris
 
 # Image label
 LABEL org.opencontainers.image.authors="Jean-Christian Paul Denis" \

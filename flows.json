@@ -449,6 +449,56 @@
         "groupType": "default"
     },
     {
+        "id": "84700ca8b7ae6e1c",
+        "type": "ui-page",
+        "name": "history",
+        "ui": "df7710b4b2c4e55b",
+        "path": "/history",
+        "icon": "chart-bar",
+        "layout": "notebook",
+        "theme": "877e716e64a22cf1",
+        "breakpoints": [
+            {
+                "name": "Default",
+                "px": "0",
+                "cols": "3"
+            },
+            {
+                "name": "Tablet",
+                "px": "576",
+                "cols": "6"
+            },
+            {
+                "name": "Small Desktop",
+                "px": "768",
+                "cols": "9"
+            },
+            {
+                "name": "Desktop",
+                "px": "1024",
+                "cols": "12"
+            }
+        ],
+        "order": 2,
+        "className": "",
+        "visible": "true",
+        "disabled": "false"
+    },
+    {
+        "id": "770bbbd7d82def54",
+        "type": "ui-group",
+        "name": "Historique de production",
+        "page": "84700ca8b7ae6e1c",
+        "width": "12",
+        "height": 1,
+        "order": 1,
+        "showTitle": true,
+        "className": "",
+        "visible": "true",
+        "disabled": "false",
+        "groupType": "default"
+    },
+    {
         "id": "d6545e4541a63e3f",
         "type": "ui-spacer",
         "group": "8d032322dc675ac9",
@@ -523,7 +573,7 @@
                 "cols": "12"
             }
         ],
-        "order": 2,
+        "order": 3,
         "className": "",
         "visible": "true",
         "disabled": "false"
@@ -559,7 +609,7 @@
                 "cols": "12"
             }
         ],
-        "order": 3,
+        "order": 4,
         "className": "",
         "visible": true,
         "disabled": false
@@ -976,7 +1026,8 @@
         "links": [
             "df19be1275e79b1c",
             "b9e756ce9dd6756f",
-            "550fd37cdd043e4d"
+            "550fd37cdd043e4d",
+            "a20fbb533e99b8a5"
         ],
         "x": 1155,
         "y": 860,
@@ -1757,8 +1808,8 @@
         "z": "3300684acfa472e7",
         "g": "f880574ac1875493",
         "name": "parse buffer",
-        "func": "function apsError(start) {\n    node.status('Error start at: ' + start);\n    throw new Error(`Données insuffisantes à la position ${start}`);\n}\n\nfunction apsStr(buffer, start, amount) {\n    if ((start + amount) > buffer.length) apsError(start);\n\n    return buffer.subarray(start, start + amount).toString('utf8');\n}\n\nfunction apsUid(buffer, start) {\n    if ((start + 12) > buffer.length) apsError(start);\n\n    return buffer.subarray(start, start + 12).toString('hex').slice(0, 12);\n}\n\nfunction apsInt(buffer, start) {\n    if ((start + 2) > buffer.length) apsError(start);\n\n    return buffer.readUInt16BE(start);\n}\n\nfunction apsDouble(buffer, start) {\n    if ((start + 4) > buffer.length) apsError(start);\n\n    return buffer.readUInt32BE(start);\n}\n\nfunction apsShort(buffer, start) {\n    try {\n        return parseInt(buffer.subarray(start, start + 1).toString('hex'), 8);\n    } catch (err) {\n        apsError(start);\n    }\n}\n\nconst describe = global.get('describe', 'memoryOnly')\nconst topic = global.get('mqtt.topic', 'default');\nconst source = 'apsystems';\n\nif (typeof msg.data !== 'object') {\n    // Grab known ECU IP\n    let units = global.get('units', 'default');\n    if (typeof units === 'object') {\n        for (const host in units) {\n            node.send([{\n                'topic': '',\n                'name': units[host]['name'],\n                'location': units[host]['location'],\n                'host': units[host]['host'],\n                'port': units[host]['port'],\n                'payload': \"APS1100160001\" + \"END\\n\",\n                'data': {}\n            }, null]);\n        }\n    }\n\n    return;\n}\n\nif (typeof msg.data.ecu !== 'object') {\n\n    // Parse ECU data\n    let buf = Buffer.from(msg.payload);\n    node.status({ text: 'buffer length: ' + buf.length});\n\n    msg.data = {\n        'ecu': {\n            'id': '',\n            'name': msg.name,\n            'location': msg.location,\n            'host': msg.host,\n            'port': msg.port,\n            'type': 0,\n            'energy_total': 0,\n            'energy_total_unit': 'kWh',\n            'energy_today': 0,\n            'energy_today_unit': 'kWh',\n            'power_instant': 0,\n            'power_instant_unit': 'W',\n            'inverters_quantity': 0,\n            'inverters_online': 0\n        }\n    }\n\n    if (apsStr(buf, 9, 4) === \"0001\") {\n        msg.data.ecu.id = apsStr(buf, 13, 12);\n        msg.data.ecu.type = parseInt(apsStr(buf, 25, 2), 10); // 1 or 2\n        msg.data.ecu.energy_total = apsDouble(buf, 27) / 10;\n        msg.data.ecu.power_instant = apsDouble(buf, 31)\n        msg.data.ecu.energy_today = apsDouble(buf, 35) / 100;\n\n        if (msg.data.ecu.type === 1) {\n            msg.data.ecu.inverters_quantity = apsInt(buf, 46);\n            msg.data.ecu.inverters_online = apsInt(buf, 48);\n\n            let offset_f = parseInt(apsStr(buf, 52, 3), 10);\n            msg.data.ecu.firmware = apsStr(buf, 55, offset_f);\n            let offset_t = parseInt(apsStr(buf, 55 + offset_f, 3), 10);\n            msg.data.ecu.timezone = apsStr(buf, 58 + offset_f, offset_t);\n\n        }\n        else if (msg.data.ecu.type === 2) {\n            msg.data.ecu.inverters_quantity = apsInt(buf, 39);\n            msg.data.ecu.inverters_online = apsInt(buf, 41);\n\n            let offset_f = parseInt(apsStr(buf, 49, 3), 10);\n            msg.data.ecu.firmware = apsStr(buf, 52, offset_f);\n        }\n\n        // Send ECU data\n        if (typeof global.get('mqtt.host', 'default') === 'string') {\n            let newMsg = {\n                'topic': global.get('mqtt.old_topic', 'default') + '/ecu/' + msg.data.ecu.id,\n                'payload': msg.data.ecu,\n            };\n            node.send([null, newMsg]);\n\n            // DKNR new version\n            for (const entity in (describe.ecu || { })) {\n                if (typeof describe.ecu[entity] === 'object') {\n                    let dknrMsg = {\n                        'topic': [topic, 'get', source, msg.data.ecu.id, describe.ecu[entity][1]].join('/'),\n                        'payload': msg.data.ecu[entity]\n                    }\n                    node.send([null, dknrMsg]);\n                }\n            };\n        }\n\n        // prepare Inverter query\n        if (msg.data.ecu.inverters_quantity > 0) {\n            msg.payload = \"APS1100280002\" + msg.data.ecu.id + \"END\\n\";\n        \n            node.send([msg, null]);\n        } else {\n            //node.send([null, msg]);\n        }\n    }\n\n    return\n}\nelse {\n\n    // Parse Inverter data\n    let buf = Buffer.from(msg.payload);\n    node.status({ text: 'buffer length: ' + buf.length});\n\n    msg.data.inverters = {}\n\n    if (apsStr(buf, 9, 4) === \"0002\") {\n        let offset1 = 0;\n        let offset2 = 26;\n\n        if (apsStr(buf, 14, 2) == \"00\") {\n            while (offset1 < apsInt(buf, 17)) {\n                if (apsStr(buf, 15, 2) == \"01\") {\n\n                    msg.data.inverters[offset1] = {\n                        'id': apsUid(buf, offset2),\n                        'ecu': msg.data.ecu.id,\n                        'name': msg.data.ecu.name + '_i' + (offset1 + 1),\n                        'location': msg.data.ecu.location,\n                        'type': Number(apsStr(buf, offset2 + 7, 2)),\n                        'online': apsShort(buf, offset2 + 6),\n                        'temperature': 0,\n                        'power': [],\n                        'voltage': [],\n                        'power_instant': 0,\n                        'voltage_mean': 0,\n                    };\n\n                    // common\n                    if (msg.data.inverters[offset1]['type'] in [1, 2, 3, 4, 5]) {\n                        msg.data.inverters[offset1]['frequency'] = apsInt(buf, offset2 + 9) / 10;\n\n                        if (msg.data.inverters[offset1]['online'] === 1) {\n                            msg.data.inverters[offset1]['temperature'] = apsInt(buf, offset2 + 11) - 100;\n                        }\n                        msg.data.inverters[offset1]['power'][0] = apsInt(buf, offset2 + 13);\n                        msg.data.inverters[offset1]['voltage'][0] = apsInt(buf, offset2 + 15);\n\n                        msg.data.inverters[offset1]['power_instant'] = msg.data.inverters[offset1]['power'][0];\n                        msg.data.inverters[offset1]['voltage_mean'] = msg.data.inverters[offset1]['voltage'][0];\n                    }\n\n                    if (msg.data.inverters[offset1]['type'] in [1, 4, 5]) {\n\n                        msg.data.inverters[offset1]['model'] = 'YC600/DS3D/DS3-H/DS3/DS3-L';\n                        msg.data.inverters[offset1]['chanel'] = 2;\n                        msg.data.inverters[offset1]['max'] = 2000; // YC600=600VA,DS3D=2000VA,DS3-H=960VA, DS3=880VA, DS3-L=730VA\n                        msg.data.inverters[offset1]['power'][1] = apsInt(buf, offset2 + 17);\n                        msg.data.inverters[offset1]['voltage'][1] = apsInt(buf, offset2 + 19);\n\n                        msg.data.inverters[offset1]['power_instant'] += msg.data.inverters[offset1]['power'][1];\n\n                        offset2 = offset2 + 21;\n                    }\n                    else if (msg.data.inverters[offset1]['type'] === 2) {\n\n                        msg.data.inverters[offset1]['model'] = 'YC1000/QT2';\n                        msg.data.inverters[offset1]['chanel'] = 4;\n                        msg.data.inverters[offset1]['max'] = 2000; // YC1000=1000VA, QT2=2000VA\n                        msg.data.inverters[offset1]['power'][1] = apsInt(buf, offset2 + 17);\n                        msg.data.inverters[offset1]['voltage'][1] = apsInt(buf, offset2 + 19);\n                        msg.data.inverters[offset1]['power'][2] = apsInt(buf, offset2 + 21);\n                        msg.data.inverters[offset1]['voltage'][2] = apsInt(buf, offset2 + 23);\n                        msg.data.inverters[offset1]['power'][3] = apsInt(buf, offset2 + 25);\n\n                        msg.data.inverters[offset1]['power_instant'] += msg.data.inverters[offset1]['power'][1];\n                        msg.data.inverters[offset1]['power_instant'] += msg.data.inverters[offset1]['power'][2];\n                        msg.data.inverters[offset1]['power_instant'] += msg.data.inverters[offset1]['power'][3];\n\n                        offset2 = offset2 + 27;\n                    }\n                    else if (msg.data.inverters[offset1]['type'] === 3) {\n\n                        msg.data.inverters[offset1]['model'] = 'QS1';\n                        msg.data.inverters[offset1]['chanel'] = 4;\n                        msg.data.inverters[offset1]['max'] = 1200; // QS1=1200VA\n                        msg.data.inverters[offset1]['power'][1] = apsInt(buf, offset2 + 17);\n                        msg.data.inverters[offset1]['power'][2] = apsInt(buf, offset2 + 19);\n                        msg.data.inverters[offset1]['power'][3] = apsInt(buf, offset2 + 21);\n\n                        msg.data.inverters[offset1]['power_instant'] += msg.data.inverters[offset1]['power'][1];\n                        msg.data.inverters[offset1]['power_instant'] += msg.data.inverters[offset1]['power'][2];\n                        msg.data.inverters[offset1]['power_instant'] += msg.data.inverters[offset1]['power'][3];\n\n                        offset2 = offset2 + 23;\n                    }\n                    else {\n                        offset2 = offset2 + 9;\n                    }\n\n                    // Send ECU inverter data\n                    if (typeof global.get('mqtt.host', 'default') === 'string') {\n                        let newMsg = {\n                            'topic': global.get('mqtt.old_topic', 'default') + '/inverter/' + msg.data.inverters[offset1]['id'],\n                            'payload': msg.data.inverters[offset1],\n                        };\n                        node.send([null, newMsg]);\n\n                        // new version\n                        for (const entity in (global.get('describe.ecu', 'memoryOnly') || {})) {\n                            if (typeof describe.inverter[entity] === 'object') {\n                                let dknrMsg = {\n                                    'topic': [topic, 'get', source, msg.data.inverters[offset1].id, describe.inverter[entity][1]].join('/'),\n                                    'payload': msg.data.inverters[offset1][entity]\n                                }\n                                node.send([null, dknrMsg]);\n                            }\n                        };\n                    }\n                }\n\n                offset1++;\n            }\n        }\n    }\n\n    // CLeanup\n    delete msg.name;\n    delete msg.location;\n    delete msg.host;\n    delete msg.port;\n    msg.topic = global.get('mqtt.old_topic', 'default') + '/' + msg.data.ecu.id;\n    msg.payload = msg.data;\n\n    // Global\n    let controls = global.get('controls', 'memoryOnly');\n    if (typeof controls !== 'object') {\n        controls = {}\n    }\n    controls[msg.payload.ecu.host] = msg.payload;\n    global.set('controls', controls, 'memoryOnly');\n\n    node.status({text: msg.payload.ecu.inverters_online + ' / ' + msg.payload.ecu.inverters_quantity});\n\n    return;\n}\n",
-        "outputs": 2,
+        "func": "function apsError(start) {\n    node.status('Error start at: ' + start);\n    throw new Error(`Données insuffisantes à la position ${start}`);\n}\n\nfunction apsStr(buffer, start, amount) {\n    if ((start + amount) > buffer.length) apsError(start);\n\n    return buffer.subarray(start, start + amount).toString('utf8');\n}\n\nfunction apsUid(buffer, start) {\n    if ((start + 12) > buffer.length) apsError(start);\n\n    return buffer.subarray(start, start + 12).toString('hex').slice(0, 12);\n}\n\nfunction apsInt(buffer, start) {\n    if ((start + 2) > buffer.length) apsError(start);\n\n    return buffer.readUInt16BE(start);\n}\n\nfunction apsDouble(buffer, start) {\n    if ((start + 4) > buffer.length) apsError(start);\n\n    return buffer.readUInt32BE(start);\n}\n\nfunction apsShort(buffer, start) {\n    try {\n        return parseInt(buffer.subarray(start, start + 1).toString('hex'), 8);\n    } catch (err) {\n        apsError(start);\n    }\n}\n\nconst describe = global.get('describe', 'memoryOnly')\nconst topic = global.get('mqtt.topic', 'default');\nconst source = 'apsystems';\n\nif (typeof msg.data !== 'object') {\n    // Grab known ECU IP\n    let units = global.get('units', 'default');\n    if (typeof units === 'object') {\n        for (const host in units) {\n            node.send([{\n                'topic': '',\n                'name': units[host]['name'],\n                'location': units[host]['location'],\n                'host': units[host]['host'],\n                'port': units[host]['port'],\n                'payload': \"APS1100160001\" + \"END\\n\",\n                'data': {}\n            }, null]);\n        }\n    }\n\n    return;\n}\n\nif (typeof msg.data.ecu !== 'object') {\n\n    // Parse ECU data\n    let buf = Buffer.from(msg.payload);\n    node.status({ text: 'buffer length: ' + buf.length});\n\n    msg.data = {\n        'ecu': {\n            'id': '',\n            'name': msg.name,\n            'location': msg.location,\n            'host': msg.host,\n            'port': msg.port,\n            'type': 0,\n            'energy_total': 0,\n            'energy_total_unit': 'kWh',\n            'energy_today': 0,\n            'energy_today_unit': 'kWh',\n            'power_instant': 0,\n            'power_instant_unit': 'W',\n            'inverters_quantity': 0,\n            'inverters_online': 0\n        }\n    }\n\n    if (apsStr(buf, 9, 4) === \"0001\") {\n        msg.data.ecu.id = apsStr(buf, 13, 12);\n        msg.data.ecu.type = parseInt(apsStr(buf, 25, 2), 10); // 1 or 2\n        msg.data.ecu.energy_total = apsDouble(buf, 27) / 10;\n        msg.data.ecu.power_instant = apsDouble(buf, 31)\n        msg.data.ecu.energy_today = apsDouble(buf, 35) / 100;\n\n        if (msg.data.ecu.type === 1) {\n            msg.data.ecu.inverters_quantity = apsInt(buf, 46);\n            msg.data.ecu.inverters_online = apsInt(buf, 48);\n\n            let offset_f = parseInt(apsStr(buf, 52, 3), 10);\n            msg.data.ecu.firmware = apsStr(buf, 55, offset_f);\n            let offset_t = parseInt(apsStr(buf, 55 + offset_f, 3), 10);\n            msg.data.ecu.timezone = apsStr(buf, 58 + offset_f, offset_t);\n\n        }\n        else if (msg.data.ecu.type === 2) {\n            msg.data.ecu.inverters_quantity = apsInt(buf, 39);\n            msg.data.ecu.inverters_online = apsInt(buf, 41);\n\n            let offset_f = parseInt(apsStr(buf, 49, 3), 10);\n            msg.data.ecu.firmware = apsStr(buf, 52, offset_f);\n        }\n\n        // Send ECU data\n        if (typeof global.get('mqtt.host', 'default') === 'string') {\n            let newMsg = {\n                'topic': global.get('mqtt.old_topic', 'default') + '/ecu/' + msg.data.ecu.id,\n                'payload': msg.data.ecu,\n            };\n            node.send([null, newMsg]);\n\n            // DKNR new version\n            for (const entity in (describe.ecu || { })) {\n                if (typeof describe.ecu[entity] === 'object') {\n                    let dknrMsg = {\n                        'topic': [topic, 'get', source, msg.data.ecu.id, describe.ecu[entity][1]].join('/'),\n                        'payload': msg.data.ecu[entity]\n                    }\n                    node.send([null, dknrMsg]);\n                }\n            };\n        }\n\n        // Send ECU data to history\n        node.send([null, null, { 'payload': RED.util.cloneMessage(msg.data.ecu) }]);\n\n        // prepare Inverter query\n        if (msg.data.ecu.inverters_quantity > 0) {\n            msg.payload = \"APS1100280002\" + msg.data.ecu.id + \"END\\n\";\n        \n            node.send([msg, null]);\n        } else {\n            //node.send([null, msg]);\n        }\n    }\n\n    return\n}\nelse {\n\n    // Parse Inverter data\n    let buf = Buffer.from(msg.payload);\n    node.status({ text: 'buffer length: ' + buf.length});\n\n    msg.data.inverters = {}\n\n    if (apsStr(buf, 9, 4) === \"0002\") {\n        let offset1 = 0;\n        let offset2 = 26;\n\n        if (apsStr(buf, 14, 2) == \"00\") {\n            while (offset1 < apsInt(buf, 17)) {\n                if (apsStr(buf, 15, 2) == \"01\") {\n\n                    msg.data.inverters[offset1] = {\n                        'id': apsUid(buf, offset2),\n                        'ecu': msg.data.ecu.id,\n                        'name': msg.data.ecu.name + '_i' + (offset1 + 1),\n                        'location': msg.data.ecu.location,\n                        'type': Number(apsStr(buf, offset2 + 7, 2)),\n                        'online': apsShort(buf, offset2 + 6),\n                        'temperature': 0,\n                        'power': [],\n                        'voltage': [],\n                        'power_instant': 0,\n                        'voltage_mean': 0,\n                    };\n\n                    // common\n                    if (msg.data.inverters[offset1]['type'] in [1, 2, 3, 4, 5]) {\n                        msg.data.inverters[offset1]['frequency'] = apsInt(buf, offset2 + 9) / 10;\n\n                        if (msg.data.inverters[offset1]['online'] === 1) {\n                            msg.data.inverters[offset1]['temperature'] = apsInt(buf, offset2 + 11) - 100;\n                        }\n                        msg.data.inverters[offset1]['power'][0] = apsInt(buf, offset2 + 13);\n                        msg.data.inverters[offset1]['voltage'][0] = apsInt(buf, offset2 + 15);\n\n                        msg.data.inverters[offset1]['power_instant'] = msg.data.inverters[offset1]['power'][0];\n                        msg.data.inverters[offset1]['voltage_mean'] = msg.data.inverters[offset1]['voltage'][0];\n                    }\n\n                    if (msg.data.inverters[offset1]['type'] in [1, 4, 5]) {\n\n                        msg.data.inverters[offset1]['model'] = 'YC600/DS3D/DS3-H/DS3/DS3-L';\n                        msg.data.inverters[offset1]['chanel'] = 2;\n                        msg.data.inverters[offset1]['max'] = 2000; // YC600=600VA,DS3D=2000VA,DS3-H=960VA, DS3=880VA, DS3-L=730VA\n                        msg.data.inverters[offset1]['power'][1] = apsInt(buf, offset2 + 17);\n                        msg.data.inverters[offset1]['voltage'][1] = apsInt(buf, offset2 + 19);\n\n                        msg.data.inverters[offset1]['power_instant'] += msg.data.inverters[offset1]['power'][1];\n\n                        offset2 = offset2 + 21;\n                    }\n                    else if (msg.data.inverters[offset1]['type'] === 2) {\n\n                        msg.data.inverters[offset1]['model'] = 'YC1000/QT2';\n                        msg.data.inverters[offset1]['chanel'] = 4;\n                        msg.data.inverters[offset1]['max'] = 2000; // YC1000=1000VA, QT2=2000VA\n                        msg.data.inverters[offset1]['power'][1] = apsInt(buf, offset2 + 17);\n                        msg.data.inverters[offset1]['voltage'][1] = apsInt(buf, offset2 + 19);\n                        msg.data.inverters[offset1]['power'][2] = apsInt(buf, offset2 + 21);\n                        msg.data.inverters[offset1]['voltage'][2] = apsInt(buf, offset2 + 23);\n                        msg.data.inverters[offset1]['power'][3] = apsInt(buf, offset2 + 25);\n\n                        msg.data.inverters[offset1]['power_instant'] += msg.data.inverters[offset1]['power'][1];\n                        msg.data.inverters[offset1]['power_instant'] += msg.data.inverters[offset1]['power'][2];\n                        msg.data.inverters[offset1]['power_instant'] += msg.data.inverters[offset1]['power'][3];\n\n                        offset2 = offset2 + 27;\n                    }\n                    else if (msg.data.inverters[offset1]['type'] === 3) {\n\n                        msg.data.inverters[offset1]['model'] = 'QS1';\n                        msg.data.inverters[offset1]['chanel'] = 4;\n                        msg.data.inverters[offset1]['max'] = 1200; // QS1=1200VA\n                        msg.data.inverters[offset1]['power'][1] = apsInt(buf, offset2 + 17);\n                        msg.data.inverters[offset1]['power'][2] = apsInt(buf, offset2 + 19);\n                        msg.data.inverters[offset1]['power'][3] = apsInt(buf, offset2 + 21);\n\n                        msg.data.inverters[offset1]['power_instant'] += msg.data.inverters[offset1]['power'][1];\n                        msg.data.inverters[offset1]['power_instant'] += msg.data.inverters[offset1]['power'][2];\n                        msg.data.inverters[offset1]['power_instant'] += msg.data.inverters[offset1]['power'][3];\n\n                        offset2 = offset2 + 23;\n                    }\n                    else {\n                        offset2 = offset2 + 9;\n                    }\n\n                    // Send ECU inverter data\n                    if (typeof global.get('mqtt.host', 'default') === 'string') {\n                        let newMsg = {\n                            'topic': global.get('mqtt.old_topic', 'default') + '/inverter/' + msg.data.inverters[offset1]['id'],\n                            'payload': msg.data.inverters[offset1],\n                        };\n                        node.send([null, newMsg]);\n\n                        // new version\n                        for (const entity in (global.get('describe.ecu', 'memoryOnly') || {})) {\n                            if (typeof describe.inverter[entity] === 'object') {\n                                let dknrMsg = {\n                                    'topic': [topic, 'get', source, msg.data.inverters[offset1].id, describe.inverter[entity][1]].join('/'),\n                                    'payload': msg.data.inverters[offset1][entity]\n                                }\n                                node.send([null, dknrMsg]);\n                            }\n                        };\n                    }\n                }\n\n                offset1++;\n            }\n        }\n    }\n\n    // CLeanup\n    delete msg.name;\n    delete msg.location;\n    delete msg.host;\n    delete msg.port;\n    msg.topic = global.get('mqtt.old_topic', 'default') + '/' + msg.data.ecu.id;\n    msg.payload = msg.data;\n\n    // Global\n    let controls = global.get('controls', 'memoryOnly');\n    if (typeof controls !== 'object') {\n        controls = {}\n    }\n    controls[msg.payload.ecu.host] = msg.payload;\n    global.set('controls', controls, 'memoryOnly');\n\n    node.status({text: msg.payload.ecu.inverters_online + ' / ' + msg.payload.ecu.inverters_quantity});\n\n    return;\n}\n",
+        "outputs": 3,
         "timeout": 0,
         "noerr": 0,
         "initialize": "",
@@ -1773,6 +1824,9 @@
             [
                 "cd522600a32e953e",
                 "0bf80703420c701e"
+            ],
+            [
+                "08e75d024187fe5c"
             ]
         ]
     },
@@ -2706,7 +2760,7 @@
         "z": "3300684acfa472e7",
         "g": "a94f12143daa85b5",
         "name": "custom - describe",
-        "func": "msg.payload.project = 'dknr-apsystems';\n\nmsg.payload.hmi = {\n    'detail': 'Surveiller',\n    'add': 'Ajouter',\n    'mqtt': 'Configurer'\n};\n\nmsg.payload.ecu = {\n    'energy_total': ['Energie totale produite', 'energyTotal', 'sensor', 'number', 'kWh', 0, { }, 'sensor', 'total_increasing', 'energy'],\n    'energy_today': ['Energie produite ce jour', 'energyToday', 'sensor', 'number', 'kWh', 0, { }, 'sensor', 'total', 'energy'],\n    'power_instant': ['Puissance instantanée', 'powerInstant', 'sensor', 'number', 'W', 0, { }, 'sensor', 'measurement', 'power'],\n    'inverters_quantity': [\"Nombre d'onduleur\", 'invertersQuantity', 'sensor', 'number', '', 0, { }, 'sensor', 'measurement', ''],\n    'inverters_online': [\"Nombre d'onduleur en ligne\", 'invertersOnline', 'sensor', 'number', '', 0, { }, 'sensor', 'measurement', ''],\n};\n\nmsg.payload.inverter = {\n    'online': ['En ligne', 'online', 'sensor', 'number', '', 0, {}, 'binary_sensor', '', 'connectivity'],\n    'temperature': ['température', 'temperature', 'sensor', 'number', '°C', 0, {}, 'sensor', 'measurement', 'temperature'],\n    'power_instant': ['Puissance instantanée', 'powerInstant', 'sensor', 'number', 'W', 0, {}, 'sensor', 'measurement', 'power'],\n    'voltage_mean': ['Voltage', 'voltageMean', 'sensor', 'number', 'V', 0, {}, 'sensor', 'measurement', 'voltage'],\n};\n\nmsg.payload.label = {\n    'power_instant': 'Puissance instantanée',\n    'energy_total': 'Energie totale produite',\n    'voltage_mean': 'Voltage',\n    'frequency': 'Fréquence',\n    'temperature': 'Température'\n};\n\nmsg.payload.unit = {\n    'power_instant': 'W',\n    'energy_total': 'kWh',\n    'voltage_mean': 'V',\n    'frequency': 'Hz',\n    'temperature': '°C'\n};\n\nmsg.payload.type = {\n    'power_instant': 'sensor',\n    'energy_total': 'sensor',\n    'voltage_mean': 'sensor',\n    'frequency': 'sensor',\n    'temperature': 'sensor'\n};\n\nmsg.payload.discovery_state_class = {\n    'power_instant': 'measurement',\n    'energy_total': 'total_increasing',\n    'voltage_mean': 'measurement',\n    'frequency': 'measurement',\n    'temperature': 'measurement'\n};\n\nmsg.payload.discovery_device_class = {\n    'power_instant': 'power',\n    'energy_total': 'energy',\n    'voltage_mean': 'voltage',\n    'frequency': 'frequency',\n    'temperature': 'temperature'\n};\n\nmsg.payload.discovery_value_template = {\n    'ecu': {\n        'power_instant': \"{% if 'power_instant' in value_json %}{{ value_json.power_instant }}{% endif %}\",\n        'energy_total': \"{% if 'energy_total' in value_json %}{{ value_json.energy_total }}{% endif %}\"\n    },\n    'inverter': {\n        'power_instant': \"{% if 'power_instant' in value_json %}{{ value_json.power_instant }}{% endif %}\",\n        'voltage_mean': \"{% if 'voltage_mean' in value_json %}{{ value_json.voltage_mean }}{% endif %}\",\n        'frequency': \"{% if 'frequency' in value_json %}{{ value_json.frequency }}{% endif %}\",\n        'temperature': \"{% if 'temperature' in value_json %}{{ value_json.temperature }}{% endif %}\"\n    },\n};\n\nreturn msg;",
+        "func": "msg.payload.project = 'dknr-apsystems';\n\nmsg.payload.hmi = {\n    'detail': 'Surveiller',\n    'history': 'Historique',\n    'add': 'Ajouter',\n    'mqtt': 'Configurer'\n};\n\nmsg.payload.ecu = {\n    'energy_total': ['Energie totale produite', 'energyTotal', 'sensor', 'number', 'kWh', 0, { }, 'sensor', 'total_increasing', 'energy'],\n    'energy_today': ['Energie produite ce jour', 'energyToday', 'sensor', 'number', 'kWh', 0, { }, 'sensor', 'total', 'energy'],\n    'power_instant': ['Puissance instantanée', 'powerInstant', 'sensor', 'number', 'W', 0, { }, 'sensor', 'measurement', 'power'],\n    'inverters_quantity': [\"Nombre d'onduleur\", 'invertersQuantity', 'sensor', 'number', '', 0, { }, 'sensor', 'measurement', ''],\n    'inverters_online': [\"Nombre d'onduleur en ligne\", 'invertersOnline', 'sensor', 'number', '', 0, { }, 'sensor', 'measurement', ''],\n};\n\nmsg.payload.inverter = {\n    'online': ['En ligne', 'online', 'sensor', 'number', '', 0, {}, 'binary_sensor', '', 'connectivity'],\n    'temperature': ['température', 'temperature', 'sensor', 'number', '°C', 0, {}, 'sensor', 'measurement', 'temperature'],\n    'power_instant': ['Puissance instantanée', 'powerInstant', 'sensor', 'number', 'W', 0, {}, 'sensor', 'measurement', 'power'],\n    'voltage_mean': ['Voltage', 'voltageMean', 'sensor', 'number', 'V', 0, {}, 'sensor', 'measurement', 'voltage'],\n};\n\nmsg.payload.label = {\n    'power_instant': 'Puissance instantanée',\n    'energy_total': 'Energie totale produite',\n    'voltage_mean': 'Voltage',\n    'frequency': 'Fréquence',\n    'temperature': 'Température'\n};\n\nmsg.payload.unit = {\n    'power_instant': 'W',\n    'energy_total': 'kWh',\n    'voltage_mean': 'V',\n    'frequency': 'Hz',\n    'temperature': '°C'\n};\n\nmsg.payload.type = {\n    'power_instant': 'sensor',\n    'energy_total': 'sensor',\n    'voltage_mean': 'sensor',\n    'frequency': 'sensor',\n    'temperature': 'sensor'\n};\n\nmsg.payload.discovery_state_class = {\n    'power_instant': 'measurement',\n    'energy_total': 'total_increasing',\n    'voltage_mean': 'measurement',\n    'frequency': 'measurement',\n    'temperature': 'measurement'\n};\n\nmsg.payload.discovery_device_class = {\n    'power_instant': 'power',\n    'energy_total': 'energy',\n    'voltage_mean': 'voltage',\n    'frequency': 'frequency',\n    'temperature': 'temperature'\n};\n\nmsg.payload.discovery_value_template = {\n    'ecu': {\n        'power_instant': \"{% if 'power_instant' in value_json %}{{ value_json.power_instant }}{% endif %}\",\n        'energy_total': \"{% if 'energy_total' in value_json %}{{ value_json.energy_total }}{% endif %}\"\n    },\n    'inverter': {\n        'power_instant': \"{% if 'power_instant' in value_json %}{{ value_json.power_instant }}{% endif %}\",\n        'voltage_mean': \"{% if 'voltage_mean' in value_json %}{{ value_json.voltage_mean }}{% endif %}\",\n        'frequency': \"{% if 'frequency' in value_json %}{{ value_json.frequency }}{% endif %}\",\n        'temperature': \"{% if 'temperature' in value_json %}{{ value_json.temperature }}{% endif %}\"\n    },\n};\n\nreturn msg;",
         "outputs": 1,
         "timeout": 0,
         "noerr": 0,
@@ -2765,7 +2819,7 @@
         "width": 0,
         "height": 0,
         "head": "",
-        "format": "<template>\n    <Teleport v-if=\"mounted\" to=\"#oe_header\">\n        <v-toolbar class=\"oe_nav\"> \n        <v-btn-group variant=\"outlined\" divided>\n            <v-btn v-if=\"oe_menus.detail\" @click=\"oe_nav('detail')\" :title=\"oe_titles.detail\" icon=\"mdi-eye\"></v-btn> \n            <v-btn v-if=\"oe_menus.add\" @click=\"oe_nav('add')\" :title=\"oe_titles.add\" icon=\"mdi-plus-thick\"></v-btn> \n            <v-btn v-if=\"oe_menus.mqtt\" @click=\"oe_nav('mqtt')\" :title=\"oe_titles.mqtt\" icon=\"mdi-cog\"></v-btn> \n        </v-btn-group>\n        <v-toolbar-title :text=\"msg.title\"></v-toolbar-title>\n        <v-btn :href=\"msg.git\"><img height=\"32px\" src=\"/icon.png\" :title=\"msg.full\"></img></v-btn>\n        </v-toolbar>\n    </Teleport>\n</template>\n\n<script>\n    export default {\n        data() {\n            return {\n                oe_menus: { detail: true, add: true, mqtt: true },\n                oe_titles: { detail: '', add: '', mqtt: '' },\n                mounted: false\n            }\n        },\n        mounted() {\n            let div = document.createElement(\"div\");\n            div.id=\"oe_header\";\n            const el = document.body.querySelector(\"#app\").prepend(div);\n            this.mounted = true;\n        },\n        methods: {\n            oe_nav: function (page) {\n                this.send(page)\n            }\n        },\n        watch: {\n            msg: function (msg) {\n                document.documentElement.setAttribute(\"lang\", msg.lang);\n                document.documentElement.setAttribute(\"translate\", \"no\");\n                document.title = msg.title;\n                this.oe_menus = msg.menus;\n                this.oe_titles = msg.titles;\n            }\n        }\n    }\n\n</script>",
+        "format": "<template>\n    <Teleport v-if=\"mounted\" to=\"#oe_header\">\n        <v-toolbar class=\"oe_nav\"> \n        <v-btn-group variant=\"outlined\" divided>\n            <v-btn v-if=\"oe_menus.detail\" @click=\"oe_nav('detail')\" :title=\"oe_titles.detail\" icon=\"mdi-eye\"></v-btn> \n            <v-btn v-if=\"oe_menus.history\" @click=\"oe_nav('history')\" :title=\"oe_titles.history\" icon=\"mdi-chart-bar\"></v-btn> \n            <v-btn v-if=\"oe_menus.add\" @click=\"oe_nav('add')\" :title=\"oe_titles.add\" icon=\"mdi-plus-thick\"></v-btn> \n            <v-btn v-if=\"oe_menus.mqtt\" @click=\"oe_nav('mqtt')\" :title=\"oe_titles.mqtt\" icon=\"mdi-cog\"></v-btn> \n        </v-btn-group>\n        <v-toolbar-title :text=\"msg.title\"></v-toolbar-title>\n        <v-btn :href=\"msg.git\"><img height=\"32px\" src=\"/icon.png\" :title=\"msg.full\"></img></v-btn>\n        </v-toolbar>\n    </Teleport>\n</template>\n\n<script>\n    export default {\n        data() {\n            return {\n                oe_menus: { detail: true, history: true, add: true, mqtt: true },\n                oe_titles: { detail: '', history: '', add: '', mqtt: '' },\n                mounted: false\n            }\n        },\n        mounted() {\n            let div = document.createElement(\"div\");\n            div.id=\"oe_header\";\n            const el = document.body.querySelector(\"#app\").prepend(div);\n            this.mounted = true;\n        },\n        methods: {\n            oe_nav: function (page) {\n                this.send(page)\n            }\n        },\n        watch: {\n            msg: function (msg) {\n                document.documentElement.setAttribute(\"lang\", msg.lang);\n                document.documentElement.setAttribute(\"translate\", \"no\");\n                document.title = msg.title;\n                this.oe_menus = msg.menus;\n                this.oe_titles = msg.titles;\n            }\n        }\n    }\n\n</script>",
         "storeOutMessages": true,
         "passthru": false,
         "resendOnRefresh": true,
@@ -2913,6 +2967,249 @@
         "wires": [
             [
                 "6326830faa9d7246"
+            ]
+        ]
+    },
+    {
+        "id": "9581755350badec0",
+        "type": "group",
+        "z": "3300684acfa472e7",
+        "name": "custom - history",
+        "style": {
+            "fill": "#6f2fa0",
+            "fill-opacity": "0.05",
+            "label": true
+        },
+        "nodes": [
+            "b192a639e9276aba",
+            "08e75d024187fe5c",
+            "96a75a2b4de5cf41",
+            "28b022cdd1712de1",
+            "a20fbb533e99b8a5",
+            "dde0045883add229",
+            "0cb7e701273f949e",
+            "b12b3c7ebef4af5a",
+            "283835c234d0a142",
+            "f6ddd941e41fdf0f"
+        ],
+        "x": 80,
+        "y": 1360,
+        "w": 1200,
+        "h": 300
+    },
+    {
+        "id": "b192a639e9276aba",
+        "type": "comment",
+        "z": "3300684acfa472e7",
+        "g": "9581755350badec0",
+        "name": "InfluxDB : DKNR_INFLUX_URL, DKNR_INFLUX_TOKEN, DKNR_INFLUX_ORG, DKNR_INFLUX_BUCKET (valeurs par défaut : conteneur dknr_apsystems_influxdb)",
+        "info": "La production de chaque ECU est écrite à chaque lecture (toutes les 5 minutes) dans la mesure `apsystems` (tag `ecu`) : energy_total, energy_today, power_instant...\nLa production est calculée par InfluxDB : dernier index de chaque fenêtre moins dernier index de la fenêtre précédente (energy_today pour les heures, plus précis, energy_total sinon).",
+        "x": 480,
+        "y": 1400,
+        "wires": []
+    },
+    {
+        "id": "08e75d024187fe5c",
+        "type": "function",
+        "z": "3300684acfa472e7",
+        "g": "9581755350badec0",
+        "name": "influxdb - write",
+        "func": "// Write ECU values to InfluxDB (one point per ECU and per reading, every 5 minutes)\nconst url = (env.get('DKNR_INFLUX_URL') || 'http://dknr_apsystems_influxdb:8086').replace(/\\/+$/, '');\nconst token = env.get('DKNR_INFLUX_TOKEN') || 'dknr-apsystems-influxdb-token';\nconst org = env.get('DKNR_INFLUX_ORG') || 'dknr';\nconst bucket = env.get('DKNR_INFLUX_BUCKET') || 'apsystems';\n\nconst ecu = msg.payload || {};\nconst id = String(ecu.id || '').replace(/[^A-Za-z0-9_-]/g, '');\nif (id === '') {\n    return null;\n}\n\n// energy_total at 0 means a bad answer from the ECU, it would break the counters\nif (typeof ecu.energy_total !== 'number' || !(ecu.energy_total > 0)) {\n    node.status({ fill: 'yellow', shape: 'ring', text: id + ' : valeur ignorée' });\n    return null;\n}\n\nconst now = Date.now();\nlet last = context.get('last', 'memoryOnly') || {};\nif (last[id] && now - last[id] < 60000) {\n    return null;\n}\n\n// always float values (a field type cannot change in InfluxDB)\nlet fields = [];\nfor (const k of ['energy_total', 'energy_today', 'power_instant', 'inverters_online', 'inverters_quantity']) {\n    if (typeof ecu[k] === 'number' && Number.isFinite(ecu[k])) {\n        fields.push(k + '=' + ecu[k]);\n    }\n}\n\nlast[id] = now;\ncontext.set('last', last, 'memoryOnly');\n\nreturn {\n    'method': 'POST',\n    'url': url + '/api/v2/write?org=' + encodeURIComponent(org) + '&bucket=' + encodeURIComponent(bucket) + '&precision=s',\n    'headers': {\n        'Authorization': 'Token ' + token,\n        'Content-Type': 'text/plain; charset=utf-8'\n    },\n    'payload': 'apsystems,ecu=' + id + ' ' + fields.join(',') + ' ' + Math.floor(now / 1000),\n    'device': id\n};\n",
+        "outputs": 1,
+        "timeout": 0,
+        "noerr": 0,
+        "initialize": "",
+        "finalize": "",
+        "libs": [],
+        "x": 300,
+        "y": 1460,
+        "wires": [
+            [
+                "96a75a2b4de5cf41"
+            ]
+        ]
+    },
+    {
+        "id": "96a75a2b4de5cf41",
+        "type": "http request",
+        "z": "3300684acfa472e7",
+        "g": "9581755350badec0",
+        "name": "influxdb - write",
+        "method": "use",
+        "ret": "txt",
+        "paytoqs": "ignore",
+        "url": "",
+        "tls": "",
+        "persist": false,
+        "proxy": "",
+        "insecureHTTPParser": false,
+        "authType": "",
+        "senderr": false,
+        "headers": [],
+        "x": 520,
+        "y": 1460,
+        "wires": [
+            [
+                "28b022cdd1712de1"
+            ]
+        ]
+    },
+    {
+        "id": "28b022cdd1712de1",
+        "type": "function",
+        "z": "3300684acfa472e7",
+        "g": "9581755350badec0",
+        "name": "write status",
+        "func": "// warn only when the write state changes, not every minute\nconst ok = msg.statusCode === 204;\nlet error = '';\nif (!ok) {\n    error = String(msg.statusCode || msg.error || 'erreur');\n    try { error = JSON.parse(msg.payload).message || error; } catch (e) { }\n}\nif (ok) {\n    node.status({ fill: 'green', shape: 'dot', text: msg.device + ' ' + new Date().toLocaleTimeString('fr-FR') });\n} else {\n    node.status({ fill: 'red', shape: 'ring', text: String(error).slice(0, 60) });\n}\nif (context.get('ok', 'memoryOnly') !== ok) {\n    context.set('ok', ok, 'memoryOnly');\n    if (ok) node.log('InfluxDB write ok');\n    else node.warn('InfluxDB write failed: ' + error);\n}\n\nreturn null;",
+        "outputs": 0,
+        "timeout": 0,
+        "noerr": 0,
+        "initialize": "",
+        "finalize": "",
+        "libs": [],
+        "x": 720,
+        "y": 1460,
+        "wires": []
+    },
+    {
+        "id": "a20fbb533e99b8a5",
+        "type": "link in",
+        "z": "3300684acfa472e7",
+        "g": "9581755350badec0",
+        "name": "custom - history",
+        "links": [
+            "911bbe32f79bec46"
+        ],
+        "x": 185,
+        "y": 1540,
+        "wires": [
+            [
+                "0cb7e701273f949e"
+            ]
+        ]
+    },
+    {
+        "id": "dde0045883add229",
+        "type": "inject",
+        "z": "3300684acfa472e7",
+        "g": "9581755350badec0",
+        "name": "refresh 5 min",
+        "props": [
+            {
+                "p": "topic",
+                "vt": "str"
+            }
+        ],
+        "repeat": "300",
+        "crontab": "",
+        "once": false,
+        "onceDelay": 0.1,
+        "topic": "refresh",
+        "x": 220,
+        "y": 1580,
+        "wires": [
+            [
+                "0cb7e701273f949e"
+            ]
+        ]
+    },
+    {
+        "id": "0cb7e701273f949e",
+        "type": "function",
+        "z": "3300684acfa472e7",
+        "g": "9581755350badec0",
+        "name": "history - request",
+        "func": "// Start a history request: first ask InfluxDB which devices it knows\nconst url = (env.get('DKNR_INFLUX_URL') || 'http://dknr_apsystems_influxdb:8086').replace(/\\/+$/, '');\nconst token = env.get('DKNR_INFLUX_TOKEN') || 'dknr-apsystems-influxdb-token';\nconst org = env.get('DKNR_INFLUX_ORG') || 'dknr';\nconst bucket = env.get('DKNR_INFLUX_BUCKET') || 'apsystems';\n\n// a tab change to another page: nothing to do\nif (typeof msg.tab === 'string' && msg.tab !== 'history') {\n    return null;\n}\n\nif (msg.topic === 'select') {\n    flow.set('history_device', String(msg.payload || '').replace(/[^A-Za-z0-9_-]/g, ''), 'memoryOnly');\n}\n\nconst reqid = (flow.get('history_req', 'memoryOnly') || 0) + 1;\nflow.set('history_req', reqid, 'memoryOnly');\nflow.set('history_parts', {}, 'memoryOnly');\n\nreturn [{\n    'method': 'POST',\n    'url': url + '/api/v2/query?org=' + encodeURIComponent(org),\n    'headers': {\n        'Authorization': 'Token ' + token,\n        'Content-Type': 'application/json',\n        'Accept': 'application/csv'\n    },\n    'payload': JSON.stringify({\n        'type': 'flux',\n        'query': 'import \"influxdata/influxdb/schema\"\\nschema.tagValues(bucket: \"' + bucket + '\", tag: \"ecu\", start: 2000-01-01T00:00:00Z)',\n        'dialect': { 'header': true, 'annotations': [], 'delimiter': ',' }\n    }),\n    'reqid': reqid,\n    'part': 'devices'\n}, null];\n",
+        "outputs": 2,
+        "timeout": 0,
+        "noerr": 0,
+        "initialize": "",
+        "finalize": "",
+        "libs": [],
+        "x": 410,
+        "y": 1560,
+        "wires": [
+            [
+                "b12b3c7ebef4af5a"
+            ],
+            [
+                "f6ddd941e41fdf0f"
+            ]
+        ]
+    },
+    {
+        "id": "b12b3c7ebef4af5a",
+        "type": "http request",
+        "z": "3300684acfa472e7",
+        "g": "9581755350badec0",
+        "name": "influxdb - query",
+        "method": "use",
+        "ret": "txt",
+        "paytoqs": "ignore",
+        "url": "",
+        "tls": "",
+        "persist": false,
+        "proxy": "",
+        "insecureHTTPParser": false,
+        "authType": "",
+        "senderr": false,
+        "headers": [],
+        "x": 630,
+        "y": 1540,
+        "wires": [
+            [
+                "283835c234d0a142"
+            ]
+        ]
+    },
+    {
+        "id": "283835c234d0a142",
+        "type": "function",
+        "z": "3300684acfa472e7",
+        "g": "9581755350badec0",
+        "name": "history - energy",
+        "func": "// Collect InfluxDB answers and compute energy per hour, day, month and year\nconst url = (env.get('DKNR_INFLUX_URL') || 'http://dknr_apsystems_influxdb:8086').replace(/\\/+$/, '');\nconst token = env.get('DKNR_INFLUX_TOKEN') || 'dknr-apsystems-influxdb-token';\nconst org = env.get('DKNR_INFLUX_ORG') || 'dknr';\nconst bucket = env.get('DKNR_INFLUX_BUCKET') || 'apsystems';\nconst tz = /^[A-Za-z_]+(\\/[A-Za-z0-9_+-]+)+$/.test(env.get('TZ') || '') ? env.get('TZ') : 'Europe/Paris';\n\n// Series configuration:\n// key: series id, name: label, color: palette slot, sign: 1 above axis / -1 below,\n// field: cumulative counter in InfluxDB, hour: counter used for hourly bars (optional),\n// scale: multiplier to get Wh\nconst DEVICE = 'ECU';\nconst SERIES = [\n    { 'key': 'production', 'name': 'Production solaire', 'color': 4, 'sign': 1, 'field': 'energy_total', 'hour': 'energy_today', 'scale': 1000 }\n];\n\n// ECU currently read, with their name and location\nfunction liveDevices() {\n    const units = global.get('units', 'default') || {};\n    const controls = global.get('controls', 'memoryOnly') || {};\n    let res = [];\n    for (const host in controls) {\n        const id = controls[host] && controls[host].ecu ? String(controls[host].ecu.id || '') : '';\n        if (id !== '') {\n            res.push({ 'value': id, 'label': units[host] ? units[host].name + ' - ' + units[host].location + ' (' + id + ')' : DEVICE + ' ' + id });\n        }\n    }\n    return res;\n}\n\nconst PERIODS = [\n    { 'key': 'hour', 'title': 'Par heure, 24 dernières heures', 'every': '1h', 'start': 'date.sub(d: 24h, from: date.truncate(t: now(), unit: 1h))' },\n    { 'key': 'day', 'title': 'Par jour, 7 derniers jours', 'every': '1d', 'start': 'date.sub(d: 7d, from: date.truncate(t: now(), unit: 1d))' },\n    { 'key': 'month', 'title': 'Par mois, 12 derniers mois', 'every': '1mo', 'start': 'date.sub(d: 12mo, from: date.truncate(t: now(), unit: 1mo))' },\n    { 'key': 'year', 'title': 'Par an', 'every': '1y', 'start': '2000-01-01T00:00:00Z' }\n];\nconst DAYS = ['dim.', 'lun.', 'mar.', 'mer.', 'jeu.', 'ven.', 'sam.'];\nconst DAYS_LONG = ['dimanche', 'lundi', 'mardi', 'mercredi', 'jeudi', 'vendredi', 'samedi'];\nconst MONTHS = ['janv.', 'févr.', 'mars', 'avr.', 'mai', 'juin', 'juil.', 'août', 'sept.', 'oct.', 'nov.', 'déc.'];\nconst MONTHS_LONG = ['janvier', 'février', 'mars', 'avril', 'mai', 'juin', 'juillet', 'août', 'septembre', 'octobre', 'novembre', 'décembre'];\n\n// InfluxDB field used by a series for a period\nfunction source(s, period) {\n    return period === 'hour' && s.hour ? s.hour : s.field;\n}\n\nfunction pad(n) {\n    return String(n).padStart(2, '0');\n}\n\n// window key in local time (container TZ)\nfunction keyOf(period, d) {\n    switch (period) {\n        case 'hour': return d.getFullYear() + '-' + pad(d.getMonth() + 1) + '-' + pad(d.getDate()) + 'T' + pad(d.getHours());\n        case 'day': return d.getFullYear() + '-' + pad(d.getMonth() + 1) + '-' + pad(d.getDate());\n        case 'month': return d.getFullYear() + '-' + pad(d.getMonth() + 1);\n        default: return String(d.getFullYear());\n    }\n}\n\n// expected bars, oldest first\nfunction buckets(period, now, firstYear) {\n    let res = [];\n    if (period === 'hour') {\n        let base = new Date(now);\n        base.setMinutes(0, 0, 0);\n        for (let i = 23; i >= 0; i--) {\n            const d = new Date(base.getTime() - i * 3600000);\n            const h = d.getHours();\n            res.push({ 'key': keyOf(period, d), 'label': h + 'h', 'title': pad(d.getDate()) + '/' + pad(d.getMonth() + 1) + ' de ' + h + 'h à ' + ((h + 1) % 24) + 'h' });\n        }\n    } else if (period === 'day') {\n        for (let i = 6; i >= 0; i--) {\n            const d = new Date(now.getFullYear(), now.getMonth(), now.getDate() - i);\n            res.push({ 'key': keyOf(period, d), 'label': DAYS[d.getDay()] + ' ' + d.getDate(), 'title': DAYS_LONG[d.getDay()] + ' ' + d.getDate() + ' ' + MONTHS_LONG[d.getMonth()] });\n        }\n    } else if (period === 'month') {\n        for (let i = 11; i >= 0; i--) {\n            const d = new Date(now.getFullYear(), now.getMonth() - i, 1);\n            res.push({ 'key': keyOf(period, d), 'label': MONTHS[d.getMonth()] + (i === 11 || d.getMonth() === 0 ? ' ' + String(d.getFullYear()).slice(2) : ''), 'title': MONTHS_LONG[d.getMonth()] + ' ' + d.getFullYear() });\n        }\n    } else {\n        for (let y = Math.min(firstYear || now.getFullYear(), now.getFullYear()); y <= now.getFullYear(); y++) {\n            res.push({ 'key': String(y), 'label': String(y), 'title': 'Année ' + y });\n        }\n    }\n\n    return res;\n}\n\n// parse InfluxDB CSV (no annotations, one header per table)\nfunction parseCsv(text) {\n    let rows = [];\n    let header = null;\n    for (const raw of String(text || '').split(/\\r?\\n/)) {\n        const line = raw.trim();\n        if (line === '') {\n            header = null;\n            continue;\n        }\n        const cells = line.split(',');\n        if (header === null) {\n            header = cells;\n            continue;\n        }\n        let row = {};\n        header.forEach((h, i) => { if (h !== '') row[h] = cells[i]; });\n        rows.push(row);\n    }\n\n    return rows;\n}\n\n// energy per series and window: last counter value minus last value of previous window\nfunction energy(period, rows) {\n    let bySource = {};\n    for (const s of SERIES) {\n        bySource[source(s, period)] = s;\n    }\n    let series = {};\n    for (const r of rows) {\n        const s = bySource[r._field];\n        const v = Number(r._value);\n        const t = new Date(r._time);\n        if (!s || !Number.isFinite(v) || isNaN(t.getTime())) {\n            continue;\n        }\n        series[s.key] = series[s.key] || {};\n        const k = keyOf(period, t);\n        series[s.key][k] = series[s.key][k] || { 't': t.getTime() };\n        series[s.key][k][r.agg === 'first' ? 'first' : 'last'] = v * (s.scale || 1);\n    }\n\n    let res = {};\n    let firstYear = null;\n    for (const f in series) {\n        res[f] = {};\n        let prev = null;\n        const wins = Object.entries(series[f]).sort((a, b) => a[1].t - b[1].t);\n        for (const [k, w] of wins) {\n            const first = w.first !== undefined ? w.first : w.last;\n            const last = w.last !== undefined ? w.last : w.first;\n            let e = prev !== null ? last - prev : last - first;\n            if (e < 0) {\n                // counter reset (daily counter, device replaced)\n                e = Math.max(0, last - first);\n            }\n            res[f][k] = Math.round(e * 10) / 10;\n            prev = last;\n            const y = new Date(w.t).getFullYear();\n            firstYear = firstYear === null ? y : Math.min(firstYear, y);\n        }\n    }\n\n    return { 'values': res, 'firstYear': firstYear };\n}\n\nfunction failure(text) {\n    let error = String(msg.statusCode || msg.error || 'erreur');\n    try { error = JSON.parse(text).message || error; } catch (e) { }\n\n    return \"Erreur InfluxDB : \" + error;\n}\n\nfunction empty(error) {\n    return [null, { 'payload': { 'error': error, 'meters': [], 'periods': [], 'fields': [] } }];\n}\n\n// stale answer\nif (msg.reqid !== flow.get('history_req', 'memoryOnly')) {\n    return null;\n}\n\n// step 1: devices list, then query the four periods\nif (msg.part === 'devices') {\n    if (msg.statusCode !== 200) {\n        return empty(failure(msg.payload));\n    }\n\n    // devices currently read first, then devices known by InfluxDB\n    let devices = new Map();\n    for (const d of liveDevices()) {\n        devices.set(d.value, d.label);\n    }\n    for (const r of parseCsv(msg.payload)) {\n        if (r._value && !devices.has(r._value)) devices.set(r._value, DEVICE + ' ' + r._value);\n    }\n\n    let device = flow.get('history_device', 'memoryOnly') || '';\n    if (!devices.has(device)) {\n        device = devices.keys().next().value || '';\n        flow.set('history_device', device, 'memoryOnly');\n    }\n\n    flow.set('history_devices', Array.from(devices.entries()).map(([value, label]) => ({ 'value': value, 'label': label })), 'memoryOnly');\n\n    if (device === '') {\n        return empty(\"Aucune donnée enregistrée pour l'instant. Les premières valeurs apparaîtront quelques minutes après la première lecture.\");\n    }\n\n    let out = [];\n    for (const p of PERIODS) {\n        const fields = Array.from(new Set(SERIES.map(s => source(s, p.key))));\n        const query = [\n            'import \"date\"',\n            'import \"timezone\"',\n            'option location = timezone.location(name: \"' + tz + '\")',\n            'start = ' + p.start,\n            'data = from(bucket: \"' + bucket + '\")',\n            '  |> range(start: start)',\n            '  |> filter(fn: (r) => r._measurement == \"apsystems\" and r.ecu == \"' + device + '\")',\n            '  |> filter(fn: (r) => r._field =~ /^(' + fields.join('|') + ')$/)',\n            '  |> filter(fn: (r) => r._value >= 0.0)',\n            'w_first = data |> aggregateWindow(every: ' + p.every + ', fn: first, createEmpty: false, timeSrc: \"_start\") |> set(key: \"agg\", value: \"first\")',\n            'w_last = data |> aggregateWindow(every: ' + p.every + ', fn: last, createEmpty: false, timeSrc: \"_start\") |> set(key: \"agg\", value: \"last\")',\n            'union(tables: [w_first, w_last])',\n            '  |> keep(columns: [\"_time\", \"_field\", \"_value\", \"agg\"])'\n        ].join('\\n');\n        out.push({\n            'method': 'POST',\n            'url': url + '/api/v2/query?org=' + encodeURIComponent(org),\n            'headers': {\n                'Authorization': 'Token ' + token,\n                'Content-Type': 'application/json',\n                'Accept': 'application/csv'\n            },\n            'payload': JSON.stringify({ 'type': 'flux', 'query': query, 'dialect': { 'header': true, 'annotations': [], 'delimiter': ',' } }),\n            'reqid': msg.reqid,\n            'part': p.key,\n            'device': device\n        });\n    }\n    node.status({ fill: 'blue', shape: 'ring', text: 'requête ' + device });\n\n    return [out, null];\n}\n\n// step 2: collect the four answers\nlet parts = flow.get('history_parts', 'memoryOnly') || {};\nparts[msg.part] = { 'status': msg.statusCode, 'payload': msg.payload };\nflow.set('history_parts', parts, 'memoryOnly');\nif (PERIODS.some(p => parts[p.key] === undefined)) {\n    return null;\n}\n\nconst now = new Date();\nlet error = '';\nlet periods = [];\nfor (const p of PERIODS) {\n    const part = parts[p.key];\n    let computed = { 'values': {}, 'firstYear': null };\n    if (part.status === 200) {\n        computed = energy(p.key, parseCsv(part.payload));\n    } else if (error === '') {\n        msg.statusCode = part.status;\n        error = failure(part.payload);\n    }\n    let totals = {};\n    const bars = buckets(p.key, now, computed.firstYear).map(b => {\n        let values = {};\n        let sum = 0;\n        for (const f in computed.values) {\n            const v = computed.values[f][b.key];\n            if (v !== undefined) {\n                values[f] = v;\n                sum += v;\n                totals[f] = (totals[f] || 0) + v;\n            }\n        }\n        return { 'key': b.key, 'label': b.label, 'title': b.title, 'values': values, 'total': sum };\n    });\n    periods.push({ 'key': p.key, 'title': p.title, 'bars': bars, 'totals': totals, 'total': Object.values(totals).reduce((a, b) => a + b, 0) });\n}\n\n// always show every configured series, even before the first value\nconst fields = SERIES.map(s => ({ 'key': s.key, 'name': s.name, 'slot': s.color, 'sign': s.sign || 1 }));\nnode.status({ fill: error === '' ? 'green' : 'red', shape: 'dot', text: msg.device + ' ' + now.toLocaleTimeString('fr-FR') });\n\nreturn [null, {\n    'payload': {\n        'error': error,\n        'meters': flow.get('history_devices', 'memoryOnly') || [],\n        'selected': msg.device,\n        'fields': fields,\n        'periods': periods,\n        'updated': now.toLocaleString('fr-FR')\n    }\n}];\n",
+        "outputs": 2,
+        "timeout": 0,
+        "noerr": 0,
+        "initialize": "",
+        "finalize": "",
+        "libs": [],
+        "x": 830,
+        "y": 1560,
+        "wires": [
+            [
+                "b12b3c7ebef4af5a"
+            ],
+            [
+                "f6ddd941e41fdf0f"
+            ]
+        ]
+    },
+    {
+        "id": "f6ddd941e41fdf0f",
+        "type": "ui-template",
+        "z": "3300684acfa472e7",
+        "g": "9581755350badec0",
+        "group": "770bbbd7d82def54",
+        "page": "",
+        "ui": "",
+        "name": "custom - history - charts",
+        "order": 1,
+        "width": 0,
+        "height": 0,
+        "head": "",
+        "format": "<template>\n    <div class=\"dkh\">\n        <div class=\"dkh-bar\">\n            <v-select v-if=\"meters.length > 1\" class=\"dkh-select\" density=\"compact\" variant=\"outlined\" hide-details\n                label=\"Compteur\" :items=\"meters\" item-title=\"label\" item-value=\"value\"\n                :model-value=\"d.selected\" @update:model-value=\"select\"></v-select>\n            <span v-else-if=\"meters.length === 1\" class=\"dkh-meter\">{{ meters[0].label }}</span>\n            <div class=\"dkh-legend\" v-if=\"fields.length > 1\">\n                <span v-for=\"f in fields\" :key=\"f.key\" class=\"dkh-key\"><i :style=\"{ background: color(f.slot) }\"></i>{{ f.name }}</span>\n            </div>\n            <span class=\"dkh-updated\" v-if=\"d.updated\">Mis à jour {{ d.updated }}</span>\n            <v-btn icon=\"mdi-refresh\" variant=\"text\" size=\"small\" title=\"Actualiser\" @click=\"refresh\"></v-btn>\n        </div>\n\n        <div v-if=\"d.error\" class=\"dkh-error\">{{ d.error }}</div>\n        <div v-else-if=\"periods.length === 0\" class=\"dkh-error\">Chargement…</div>\n\n        <div class=\"dkh-grid\">\n            <div v-for=\"p in periods\" :key=\"p.key\" class=\"dkh-card\">\n                <div class=\"dkh-head\">\n                    <span class=\"dkh-title\">{{ p.title }}</span>\n                    <span class=\"dkh-total\">{{ headTotal(p) }}</span>\n                </div>\n                <div class=\"dkh-plot\">\n                <svg v-if=\"W > 0\" :width=\"W\" :height=\"H\" class=\"dkh-svg\" role=\"img\" :aria-label=\"p.title\">\n                    <g v-for=\"t in geo(p).ticks\" :key=\"'t' + t.v\">\n                        <line :x1=\"PL\" :x2=\"W - PR\" :y1=\"t.y\" :y2=\"t.y\" class=\"dkh-grid-line\" :class=\"{ 'dkh-base': t.v === 0 }\"></line>\n                        <text :x=\"PL - 6\" :y=\"t.y + 4\" text-anchor=\"end\" class=\"dkh-tick\">{{ kwh(Math.abs(t.v), geo(p).dec) }}</text>\n                    </g>\n                    <g v-for=\"(b, i) in p.bars\" :key=\"b.key\" class=\"dkh-col\" :class=\"{ 'dkh-dim': isHover(p) && hover[p.key] !== i }\"\n                        @mouseenter=\"setHover(p, i)\" @mouseleave=\"setHover(p, null)\" @click=\"setHover(p, i)\">\n                        <rect :x=\"geo(p).x(i) - geo(p).gap / 2\" :y=\"PT\" :width=\"geo(p).slot\" :height=\"H - PT - PB\" class=\"dkh-hit\"></rect>\n                        <path v-for=\"s in segs(p, b, i)\" :key=\"s.k\" :d=\"s.d\" :fill=\"s.c\"></path>\n                        <text v-if=\"showLabel(p, i)\" :x=\"geo(p).x(i) + geo(p).bw / 2\" :y=\"H - 6\" text-anchor=\"middle\" class=\"dkh-tick\">{{ b.label }}</text>\n                    </g>\n                </svg>\n                </div>\n                <div class=\"dkh-detail\" v-html=\"detail(p)\"></div>\n            </div>\n        </div>\n    </div>\n</template>\n\n<script>\nexport default {\n    data() {\n        return {\n            W: 0, H: 230, PL: 46, PR: 8, PT: 10, PB: 24,\n            observer: null,\n            hover: {},\n            palette: ['#2a78d6', '#eb6834', '#1baf7a', '#eda100', '#e87ba4', '#008300', '#6250d6', '#e34948']\n        }\n    },\n    computed: {\n        d() { return (this.msg && this.msg.payload) || {}; },\n        meters() { return this.d.meters || []; },\n        fields() { return this.d.fields || []; },\n        periods() { return this.d.periods || []; }\n    },\n    mounted() {\n        // the dashboard lowercases svg attributes (viewBox is lost),\n        // so charts are drawn in pixels at the real width of the card\n        this.resize();\n        if (window.ResizeObserver) {\n            this.observer = new ResizeObserver(() => this.resize());\n            this.observer.observe(this.$el);\n        } else {\n            window.addEventListener('resize', this.resize);\n        }\n        this.send({ topic: 'load' });\n    },\n    updated() {\n        this.resize();\n    },\n    unmounted() {\n        if (this.observer) this.observer.disconnect();\n        window.removeEventListener('resize', this.resize);\n    },\n    methods: {\n        resize() {\n            const el = this.$el && this.$el.querySelector ? this.$el.querySelector('.dkh-plot') : null;\n            const w = el ? Math.floor(el.clientWidth) : 0;\n            if (w > 0 && w !== this.W) this.W = w;\n        },\n        select(v) { this.hover = {}; this.send({ topic: 'select', payload: v }); },\n        refresh() { this.send({ topic: 'refresh' }); },\n        color(slot) { return this.palette[(slot - 1) % this.palette.length]; },\n        isHover(p) { return this.hover[p.key] !== undefined && this.hover[p.key] !== null; },\n        setHover(p, i) { this.hover = { ...this.hover, [p.key]: i }; },\n        kwh(wh, fixed) {\n            const v = (wh || 0) / 1000;\n            if (v === 0) return '0';\n            const dec = fixed !== undefined ? fixed : (v === 0 ? 0 : (v < 10 ? 2 : (v < 100 ? 1 : 0)));\n            return v.toLocaleString('fr-FR', { minimumFractionDigits: dec, maximumFractionDigits: dec });\n        },\n        // geometry of a chart: nice y scale and bar positions\n        // stacked sums above (sign 1) and below (sign -1) the axis\n        sums(b) {\n            let pos = 0, neg = 0;\n            for (const f of this.fields) {\n                const v = b.values[f.key] || 0;\n                if (f.sign < 0) neg += v; else pos += v;\n            }\n            return { pos: pos, neg: neg };\n        },\n        hasNeg() {\n            return this.fields.some(f => f.sign < 0);\n        },\n        // geometry of a chart: nice y scale and bar positions\n        geo(p) {\n            const n = Math.max(1, p.bars.length);\n            const pos = Math.max(0, ...p.bars.map(b => this.sums(b).pos));\n            const neg = Math.max(0, ...p.bars.map(b => this.sums(b).neg));\n            const range = pos + neg;\n            let step = 1000;\n            if (range > 0) {\n                const raw = range / (this.hasNeg() ? 5 : 4);\n                const mag = Math.pow(10, Math.floor(Math.log10(raw)));\n                step = [1, 2, 2.5, 5, 10].map(m => m * mag).find(s => s >= raw);\n            }\n            const top = Math.max(step, Math.ceil(pos / step) * step);\n            const bottom = this.hasNeg() ? Math.max(step, Math.ceil(neg / step) * step) : 0;\n            const plotH = this.H - this.PT - this.PB;\n            const slot = (this.W - this.PL - this.PR) / n;\n            const bw = Math.min(40, slot * 0.7);\n            const y = v => this.PT + plotH - ((v + bottom) / (top + bottom)) * plotH;\n            let ticks = [];\n            for (let v = -bottom; v <= top + step / 2; v += step) ticks.push({ v: Math.round(v), y: y(v) });\n            return {\n                slot: slot, bw: bw, gap: slot - bw, y: y, ticks: ticks,\n                dec: step % 1000 === 0 ? 0 : (step % 100 === 0 ? 1 : (step % 10 === 0 ? 2 : 3)),\n                x: i => this.PL + i * slot + (slot - bw) / 2\n            };\n        },\n        // stacked segments from the axis, 2px surface gap, rounded far end\n        segs(p, b, i) {\n            const g = this.geo(p);\n            const x = g.x(i);\n            let res = [];\n            for (const sign of [1, -1]) {\n                const keys = this.fields.filter(f => (f.sign < 0 ? -1 : 1) === sign && b.values[f.key] > 0);\n                let acc = 0;\n                keys.forEach((f, j) => {\n                    const near = g.y(sign * acc) - sign * (j > 0 ? 2 : 0);\n                    acc += b.values[f.key];\n                    let far = g.y(sign * acc);\n                    if (sign * (near - far) < 1) far = near - sign;\n                    const h = Math.abs(near - far);\n                    const r = j === keys.length - 1 ? Math.min(4, h, g.bw / 2) : 0;\n                    const d = 'M' + x + ',' + near + 'V' + (far + sign * r) +\n                        (r ? 'Q' + x + ',' + far + ' ' + (x + r) + ',' + far : '') +\n                        'H' + (x + g.bw - r) +\n                        (r ? 'Q' + (x + g.bw) + ',' + far + ' ' + (x + g.bw) + ',' + (far + sign * r) : '') +\n                        'V' + near + 'Z';\n                    res.push({ k: f.key, d: d, c: this.color(f.slot) });\n                });\n            }\n            return res;\n        },\n        headTotal(p) {\n            if (this.fields.length > 1 && this.hasNeg()) {\n                return this.fields.map(f => f.name + ' ' + this.kwh((p.totals || {})[f.key] || 0)).join(' · ') + ' kWh';\n            }\n            return this.kwh(p.total) + ' kWh';\n        },\n        // skip labels when they do not fit, always keep the current period\n        showLabel(p, i) {\n            const n = p.bars.length;\n            const longest = Math.max(1, ...p.bars.map(b => String(b.label).length));\n            const every = Math.max(1, Math.ceil((longest * 6.5 + 6) / this.geo(p).slot));\n            return (n - 1 - i) % every === 0;\n        },\n        // detail line: hovered bar, current period by default\n        detail(p) {\n            if (p.bars.length === 0) return '';\n            const i = this.isHover(p) ? this.hover[p.key] : p.bars.length - 1;\n            const b = p.bars[i];\n            const parts = this.fields.filter(f => b.values[f.key] !== undefined || this.hasNeg())\n                .map(f => '<i style=\"background:' + this.color(f.slot) + '\"></i>' + f.name + ' ' + this.kwh(b.values[f.key] || 0) + (this.hasNeg() ? ' kWh' : ''));\n            const head = this.hasNeg() ? '' : ' : ' + this.kwh(b.total) + ' kWh';\n            return '<b>' + b.title + (this.isHover(p) ? '' : ' (en cours)') + head + '</b>' +\n                (parts.length > 1 ? '<span>' + parts.join('</span><span>') + '</span>' : '');\n        }\n    }\n}\n</script>\n\n<style>\n.dkh { width: 100%; color: #1f1f1e; }\n.dkh-bar { display: flex; flex-wrap: wrap; align-items: center; gap: 8px 16px; margin-bottom: 12px; }\n.dkh-select { max-width: 360px; min-width: 220px; }\n.dkh-meter { font-weight: 600; }\n.dkh-legend { display: flex; flex-wrap: wrap; gap: 4px 12px; font-size: 0.85rem; color: #52514e; }\n.dkh-key i, .dkh-detail i { display: inline-block; width: 10px; height: 10px; border-radius: 2px; margin-right: 5px; vertical-align: -1px; }\n.dkh-updated { margin-left: auto; font-size: 0.8rem; color: #7a7974; }\n.dkh-error { padding: 12px; border-radius: 4px; background: #f5f5f4; color: #52514e; margin-bottom: 12px; }\n.dkh-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(min(100%, 420px), 1fr)); gap: 12px; }\n.dkh-card { border: 1px solid #e3e2de; border-radius: 4px; padding: 10px 12px 8px; background: #fff; min-width: 0; }\n.dkh-head { display: flex; flex-wrap: wrap; justify-content: space-between; align-items: baseline; gap: 0 12px; }\n.dkh-title { font-weight: 600; color: #0094ce; white-space: nowrap; }\n.dkh-total { font-size: 0.9rem; color: #52514e; margin-left: auto; }\n.dkh-plot { width: 100%; min-height: 230px; margin-top: 6px; overflow: hidden; }\n.dkh-svg { display: block; touch-action: manipulation; }\n.dkh-grid-line { stroke: #ebeae6; stroke-width: 1; }\n.dkh-base { stroke: #b5b3ad; }\n.dkh-tick { font-size: 11px; fill: #7a7974; }\n.dkh-hit { fill: transparent; cursor: pointer; }\n.dkh-col path { transition: opacity 0.15s; }\n.dkh-dim path { opacity: 0.35; }\n.dkh-detail { min-height: 2.6em; font-size: 0.85rem; color: #52514e; display: flex; flex-wrap: wrap; gap: 2px 12px; }\n.dkh-detail b { width: 100%; color: #1f1f1e; font-weight: 600; }\n</style>\n",
+        "storeOutMessages": true,
+        "passthru": false,
+        "resendOnRefresh": true,
+        "templateScope": "local",
+        "className": "",
+        "x": 1060,
+        "y": 1620,
+        "wires": [
+            [
+                "0cb7e701273f949e"
             ]
         ]
     }
